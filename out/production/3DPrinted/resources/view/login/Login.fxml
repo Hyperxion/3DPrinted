@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<GridPane alignment="center" hgap="10" styleClass="root" vgap="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.login.ControllerLogin">
+   <children>
+   
+       <Text id="welcome-text" text="Welcome" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="0" />
+   
+       <Label text="User Name:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+   
+       <TextField fx:id="uName" text="edemko" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+   
+       <Label text="Password:" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+   
+       <PasswordField fx:id="uPasswd" text="5fsDhbBL7" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+   
+       <Label text="Database address: " GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+   
+       <TextField fx:id="ipAddress" text="database" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+   
+       <Text GridPane.columnIndex="1" GridPane.rowIndex="6" />
+      <Button fx:id="btn_login" mnemonicParsing="false" onAction="#signIn" prefHeight="25.0" prefWidth="178.0" text="Login" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+   </children>
+
+    <padding><Insets bottom="10" left="25" right="25" top="25" /></padding>
+
+    <stylesheets>
+        <URL value="@/resources/css/loginWin.css" />
+    </stylesheets>
+   <columnConstraints>
+      <ColumnConstraints />
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints maxHeight="25.0" minHeight="25.0" prefHeight="25.0" />
+      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+   </rowConstraints>
+
+</GridPane>
