@@ -8,7 +8,7 @@ import javafx.collections.ObservableList;
 public class Order {
 
     //table columns
-    private SimpleIntegerProperty order_id, order_customerID;
+    private SimpleIntegerProperty orderID, order_customerID;
     private SimpleStringProperty order_status, order_comment, order_dateCreated, order_dueDate;
 
     //table view columns
@@ -18,6 +18,7 @@ public class Order {
 
 
     private ObservableList<OrderItem> orderItems;
+
     private Customer customer;
 
 }
