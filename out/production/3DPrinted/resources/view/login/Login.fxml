@@ -12,7 +12,7 @@
 <?import javafx.scene.text.Text?>
 
 <GridPane alignment="center" hgap="10" styleClass="root" vgap="10" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.login.ControllerLogin">
-   <children>
+
    
        <Text id="welcome-text" text="Welcome" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="0" />
    
@@ -30,7 +30,7 @@
    
        <Text GridPane.columnIndex="1" GridPane.rowIndex="6" />
       <Button fx:id="btnLogin" mnemonicParsing="false" prefHeight="25.0" prefWidth="178.0" text="Login" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
-   </children>
+
 
     <padding><Insets bottom="10" left="25" right="25" top="25" /></padding>
 

@@ -1,10 +1,10 @@
 package controller.login;
 
 
+import classes.Cost;
 import classes.PrintedAPI;
 import com.zaxxer.hikari.HikariDataSource;
 import controller.main.ControllerMain;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -58,12 +58,12 @@ public class ControllerLogin implements Initializable {
                 stage.setMaximized(true);
                 stage.show();
 
+                PrintedAPI.serviceStart(ctrlMain.getServiceDownloadAllTables());
+                //ctrlMain.displayAllTables();
+
             } catch (IOException exception) {
                 exception.printStackTrace();
             }
-
-
-
         });
 
     }
