@@ -332,7 +332,7 @@ public class ControllerMain implements Initializable {
     private Button ordersBtnNew;
 
     @FXML
-    private Label ordersLabelSelected;
+    private Label ordersLabelSelected, ordersLabelSoldOrders, ordersLabelSoldOrdersProfit, ordersLabelSoldOrdersCosts;
 
     @FXML
     private TableColumn<Order, String> ordersColCustomer, ordersColStatus, ordersColComment, ordersColDateCreated, ordersColDueDate, ordersColTotalBuildTimeFormatted;
