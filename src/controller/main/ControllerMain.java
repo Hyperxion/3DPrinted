@@ -3,9 +3,7 @@ package controller.main;
 import classes.*;
 import classes.Object;
 import com.zaxxer.hikari.HikariDataSource;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -209,10 +207,10 @@ public class ControllerMain implements Initializable {
     private TableView<Cost> costsTv;
 
     @FXML
-    private Button costsBtnNew;
+    private Button costsBtnNew, costsBtnNewDelete, costsBtnNewDetails, costsBtnNewEdit, costsBtnNewRefresh;
 
     @FXML
-    private Label costsLabelSelected;
+    private Label costsLabelSelected, costsLabelTotal, costsLabelSelectedQuantity, costsLabelSelectedShippingPriceTotal, costsLabelTotalQuantity, costsLabelTotalShippingPriceTotal;
 
     @FXML
     private TableColumn<Cost, Integer> costsColId, costsColQuantity, costsColPrinterID;
@@ -233,10 +231,13 @@ public class ControllerMain implements Initializable {
     private TableView<Printer> printersTv;
 
     @FXML
-    private Button printersBtnNew;
+    private Button printersBtnNew, printersBtnDelete, printersBtnDetails, printersBtnEdit, printersBtnRefresh;
 
     @FXML
-    private Label printersLabelSelectedTotal;
+    private Label printersLabelSelectedTotal, printersLabelTotal, printersLabelTotalItemsPrinted, printersLabelTotalIncomes, printersLabelSelected, printersLabelSelectedPriceInclExpenses,
+            printersLabelSelectedExpenses, printersLabelSelectedPriceOfPrinters, printersLabelSelectedDutyTaxTotal, printersLabelSelectedShippingPriceTotal, printersLabelTotalExpenses,
+            printersLabelTotalPriceOfPrinters, printersLabelTotalDutyTaxTotal, printersLabelTotalShippingPriceTotal, printersLabelSelectedItemsPrinted, printersLabelSelectedIncomes,
+            printersLabelTotalPriceInclExpenses;
 
     @FXML
     private TableColumn<Printer, Integer> printersColId, printersColItemsSold;
@@ -257,10 +258,12 @@ public class ControllerMain implements Initializable {
     private TableView<Material> matTv;
 
     @FXML
-    private Button matBtnNew;
+    private Button matBtnNew, matBtnDelete, matBtnDetails, matBtnEdit, matBtnRefresh;
 
     @FXML
-    private Label matLabelSelectedTotal;
+    private Label matLabelSelectedTotal, matLabelTotal, matLabelTotalColorsTypes, matLabelTotalTrash, matLabelTotalAvgRollPrice, matLabelTotalRemainingWeightRolls, matLabelSelected,
+            matLabelSelectedRemainingWeightRolls, matLabelSelectedSoldWeightRolls, matLabelSelectedWeightRolls, matLabelSelectedRevenueProfit, matLabelSelectedShippingPriceTotal,
+            matLabelTotalSoldWeightRolls, matLabelTotalWeightRolls, matLabelTotalRevenueProfit, matLabelTotalShippingPriceTotal, matLabelSelectedTrash, matLabelSelectedAvgRollPrice;
 
     @FXML
     private TableColumn<Material, String> matColColor, matColManufacturer, matColType, matColFinished, matColSeller, matColPurchDate, matColComment;
@@ -281,10 +284,10 @@ public class ControllerMain implements Initializable {
     private TableView<Object> objTv;
 
     @FXML
-    private Button objBtnNew;
+    private Button objBtnNew, objBtnDelete, objBtnDetails, objBtnEdit, objBtnRefresh;
 
     @FXML
-    private Label objLabelSelectedTotal;
+    private Label objLabelSelectedTotal, objLabelTotal, objLabelSelected, objLabelSelectedWeights, objLabelSelectedPriceCostsProfit, objLabelSelectedTimesPrinted, objLabelSelectedBuildTime, objLabelSelectedPerHour;
 
     @FXML
     private TableColumn<Object, String> objColName, objColStlLink, objColBuildTimeFormatted, objColComment;
@@ -305,10 +308,11 @@ public class ControllerMain implements Initializable {
     private TableView<Customer> custTv;
 
     @FXML
-    private Button custBtnNew;
+    private Button custBtnNew, custBtnDelete, custBtnDetails, custBtnEdit, custBtnRefresh;
 
     @FXML
-    private Label labelCustSelectedTotal;
+    private Label custLabelTotal, custLabelSelected, custLabelSelectedCosts, custLabelSelectedPrice, custLabelSelectedItemsPrinted, custLabelSelectedOrders, custLabelSelectedWeights,
+            custLabelSelectedPerHour;
 
     @FXML
     private TableColumn<Customer, String> custColLastName, custColFirstName, custColDateCreated, custColMail, custColPhone, custColAddress, custColCity, custColZipCode, custColCountry, custColCompany, custColComment;
@@ -329,10 +333,13 @@ public class ControllerMain implements Initializable {
     private TableView<Order> ordersTv;
 
     @FXML
-    private Button ordersBtnNew;
+    private Button ordersBtnNew, ordersBtnMarkNotSold, ordersBtnCancel, ordersBtnMarkSold, ordersBtnNewFrom, ordersBtnRefresh, ordersBtnEdit, ordersBtnDelete;
 
     @FXML
-    private Label ordersLabelSelected, ordersLabelSoldOrders, ordersLabelSoldOrdersProfit, ordersLabelSoldOrdersCosts;
+    private Label ordersLabelSoldOrders, ordersLabelSoldOrdersProfit, ordersLabelSoldOrdersCosts, ordersLabelSold, ordersLabelNotSold,
+            ordersLabelNotSoldPriceCostsProfit, ordersLabelTotal, ordersLabelTotaItemsPrinted, ordersLabelTotalBuildTime, ordersLabelTotalWeightSupports,
+            ordersLabelTotalPerHour, ordersLabelTotalPriceCostsProfit, ordersLabelSelected, ordersLabelSelectedBuildTime, ordersLabelSelectedItemsPrinted,
+            ordersLabelSelectedWeightSupports, ordersLabelSelectedPerHour, ordersLabelSelectedPriceCostsProfit;
 
     @FXML
     private TableColumn<Order, String> ordersColCustomer, ordersColStatus, ordersColComment, ordersColDateCreated, ordersColDueDate, ordersColTotalBuildTimeFormatted;
@@ -366,9 +373,33 @@ public class ControllerMain implements Initializable {
     //Regarding costs  table view it is only printer name.
     //This method uses table of printers and id of printer stored in listOfCosts to get and set printer name for particular Cost object
     private void completeListOfCosts(){
+
+        int total = listOfCosts.size(), totalQuantity = 0;
+        double shipping = 0, price = 0;
+
         for (Cost cost : listOfCosts) {
             cost.setPrinterName(Printer.getName(listOfPrinters, cost.getPrinterId()));
+
+            totalQuantity += cost.getQuantity();
+            shipping += cost.getShipping();
+            price += cost.getPrice();
+
         }
+
+        int finalTotalQuantity = totalQuantity;
+
+        double finalPrice = PrintedAPI.round(price, 2);
+        double finalShipping = PrintedAPI.round(shipping, 2);
+
+        Platform.runLater(() -> {
+            costsLabelTotal.setText("Total (" + listOfCosts.size() + ")");
+            costsLabelTotalQuantity.setText("" + finalTotalQuantity);
+            costsLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f)", finalShipping, finalPrice, finalShipping + finalPrice));
+        });
+    }
+
+    private void calculateSelectedCostsStatistics(){
+
     }
 
 
@@ -604,10 +635,10 @@ public class ControllerMain implements Initializable {
         serviceDownloadAllTables = new Service() {
             @Override
             protected Task<ObservableList<Cost>> createTask() {
-                return new Task<ObservableList<Cost>>() {
-                    @Override
-                    protected ObservableList<Cost> call() throws Exception {
-
+            return new Task<ObservableList<Cost>>() {
+                @Override
+                protected ObservableList<Cost> call() throws Exception {
+                    try {
                         int i = -1, max = 12;
 
                         updateProgress(i, 6);
@@ -674,12 +705,24 @@ public class ControllerMain implements Initializable {
                         updateMessage("All done.");
                         updateProgress(max, max);
 
-                        progressBar.setVisible(false);
-                        //PrintedAPI.serviceStart(serviceDisplayAllTables);
+//                        Platform.runLater(new Runnable(){
+//                            @Override
+//                            public void run() {
+//                                calculateSelectedCostsStatistics();
+//                            }
+//                        });
+                        calculateSelectedCostsStatistics();
 
-                        return null;
+
+                        progressBar.setVisible(false);
+
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
                     }
-                };
+
+                return null;
+                }
+            };
             }
         };
         progressBar.progressProperty().bind(serviceDownloadAllTables.progressProperty());

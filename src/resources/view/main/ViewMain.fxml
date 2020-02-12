@@ -188,7 +188,7 @@
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label fx:id="matLabelSelectedTotal11" text="Not Sold (0)" textFill="#ffa100" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+                                                <Label fx:id="ordersLabelNotSold" text="Not Sold (0)" textFill="#ffa100" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="5">
                                                    <font>
                                                       <Font name="System Bold" size="20.0" />
                                                    </font>
@@ -199,7 +199,7 @@
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label fx:id="matLabelSelectedTotal111" text="Total (0)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="10">
+                                                <Label fx:id="ordersLabelTotal" text="Total (0)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="10">
                                                    <font>
                                                       <Font name="System Bold" size="20.0" />
                                                    </font>
@@ -234,7 +234,7 @@
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label fx:id="matLabelSelectedTotal1111" text="Selected (0)" textFill="#1400ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="27">
+                                                <Label fx:id="ordersLabelSelected" text="Selected (0)" textFill="#1400ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="27">
                                                    <font>
                                                       <Font name="System Bold" size="20.0" />
                                                    </font>
@@ -244,7 +244,7 @@
                                                 <Label text="Weight/Support Weight" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="35" />
                                                 <Label text="Price per Hour" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="32" />
                                                 <Label text="Price/Costs (Profit)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="29" />
-                                                <Label fx:id="ordersLabelSelectedtemsPrinted" text="1 234" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="42">
+                                                <Label fx:id="ordersLabelSelectedItemsPrinted" text="1 234" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="42">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
@@ -354,11 +354,11 @@
                                     <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <Button fx:id="ordersBtnNew1" mnemonicParsing="false" prefWidth="295.0" text="New Customer" GridPane.columnSpan="2" />
-                                    <Button fx:id="btnCancelOrder1" mnemonicParsing="false" prefWidth="150.0" text="Delete Customer(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <Button fx:id="btnOrdersFilters1" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                    <Button fx:id="btnNewOrderFrom1" mnemonicParsing="false" prefWidth="150.0" text="Edit Customer" GridPane.rowIndex="1" />
-                                    <Button fx:id="order_btn_refresh1" mnemonicParsing="false" prefWidth="305.0" text="Refresh" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                    <Button fx:id="custBtnNew" mnemonicParsing="false" prefWidth="295.0" text="New Customer" GridPane.columnSpan="2" />
+                                    <Button fx:id="custBtnDelete" mnemonicParsing="false" prefWidth="150.0" text="Delete Customer(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Button fx:id="custBtnDetails" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                    <Button fx:id="custBtnEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Customer" GridPane.rowIndex="1" />
+                                    <Button fx:id="custBtnRefresh" mnemonicParsing="false" prefWidth="305.0" text="Refresh" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                                  </children>
                               </GridPane>
                               <Region prefHeight="50.0" VBox.vgrow="ALWAYS" />
@@ -394,66 +394,57 @@
                                     <RowConstraints minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
                                     <RowConstraints minHeight="10.0" prefHeight="18.0" vgrow="SOMETIMES" />
                                     <RowConstraints minHeight="10.0" prefHeight="18.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="18.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="18.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
                                     <Label text="Total Customers" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                    <Label text="999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                                    <Label fx:id="custLabelTotal" text="999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label fx:id="matLabelSelectedTotal1111" text="Selected (0)" textFill="#0004ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                                    <Label fx:id="custLabelSelected" text="Selected (0)" textFill="#0004ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
                                        <font>
                                           <Font name="System Bold" size="20.0" />
                                        </font>
                                     </Label>
-                                    <Label text="Items Printed" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="18" />
                                     <Label text="Total Costs" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="15" />
                                     <Label text="Total Price" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="12" />
                                     <Label text="Items Printed" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9" />
                                     <Label text="Total Orders" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
-                                    <Label text="1 234" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="19">
+                                    <Label fx:id="custLabelSelectedCosts" text="1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="16">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="16">
+                                    <Label fx:id="custLabelSelectedPrice" text="1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="13">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="13">
+                                    <Label fx:id="custLabelSelectedItemsPrinted" text="999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="10">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="10">
+                                    <Label fx:id="custLabelSelectedOrders" text="999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="7">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="7">
+                                    <Label text="Weight/Supports (Total)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="18" />
+                                    <Label fx:id="custLabelSelectedWeights" text="99 999g/99 999g (99 999g)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="19">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="Weight/Supports (Total)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="21" />
-                                    <Label text="99 999g/99 999g (99 999g)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="22">
+                                    <Label text="Build Time" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="21" />
+                                    <Label text="Price per Hour" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="24" />
+                                    <Label fx:id="custLabelSelectedBuildTime" text="999h 59m (99.9d)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="22">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="Build Time" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="24" />
-                                    <Label text="Price per Hour" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="27" />
-                                    <Label text="999h 59m (99.9d)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="25">
-                                       <font>
-                                          <Font name="System Bold" size="14.0" />
-                                       </font>
-                                    </Label>
-                                    <Label text="1 234$/h" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="28">
+                                    <Label fx:id="custLabelSelectedPerHour" text="1 234$/h" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="25">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
@@ -519,11 +510,11 @@
                                     <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <Button fx:id="ordersBtnNew11" mnemonicParsing="false" prefWidth="295.0" text="New Object" GridPane.columnSpan="2" />
-                                    <Button fx:id="btnCancelOrder11" mnemonicParsing="false" prefWidth="150.0" text="Delete Object(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <Button fx:id="btnOrdersFilters11" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                    <Button fx:id="btnNewOrderFrom11" mnemonicParsing="false" prefWidth="150.0" text="Edit Object" GridPane.rowIndex="1" />
-                                    <Button fx:id="order_btn_refresh11" mnemonicParsing="false" prefWidth="305.0" text="Refresh" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                    <Button fx:id="objBtnNew" mnemonicParsing="false" prefWidth="295.0" text="New Object" GridPane.columnSpan="2" />
+                                    <Button fx:id="objBtnDelete" mnemonicParsing="false" prefWidth="150.0" text="Delete Object(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Button fx:id="objBtnDetails" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                    <Button fx:id="objBtnEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Object" GridPane.rowIndex="1" />
+                                    <Button fx:id="objBtnRefresh" mnemonicParsing="false" prefWidth="305.0" text="Refresh" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                                  </children>
                               </GridPane>
                               <Region prefHeight="50.0" VBox.vgrow="ALWAYS" />
@@ -556,12 +547,12 @@
                                  </rowConstraints>
                                  <children>
                                     <Label text="Total Objects" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-                                    <Label text="999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                                    <Label fx:id="objLabelTotal" text="999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label fx:id="matLabelSelectedTotal11111" text="Selected (0)" textFill="#0004ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                                    <Label fx:id="objLabelSelected" text="Selected (0)" textFill="#0004ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
                                        <font>
                                           <Font name="System Bold" size="20.0" />
                                        </font>
@@ -569,29 +560,29 @@
                                     <Label text="Weight/Supports (Total)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="12" />
                                     <Label text="Price/Costs (Profit)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9" />
                                     <Label text="Times Printed" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
-                                    <Label text="99 999g/99 999g (99 999g)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="13">
+                                    <Label fx:id="objLabelSelectedWeights" text="99 999g/99 999g (99 999g)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="13">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="1 234$/1 234$ (1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="10">
+                                    <Label fx:id="objLabelSelectedPriceCostsProfit" text="1 234$/1 234$ (1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="10">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="7">
+                                    <Label fx:id="objLabelSelectedTimesPrinted" text="999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="7">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
                                     <Label text="Build Time" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="15" />
                                     <Label text="Price per Hour" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="18" />
-                                    <Label text="999h 59m (99.9d)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="16">
+                                    <Label fx:id="objLabelSelectedBuildTime" text="999h 59m (99.9d)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="16">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="1 234$/h" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="19">
+                                    <Label fx:id="objLabelSelectedPerHour" text="1 234$/h" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="19">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
@@ -619,7 +610,7 @@
                                         <TableColumn fx:id="matColType" prefWidth="50.0" text="Type" />
                                         <TableColumn fx:id="matColColor" minWidth="7.0" prefWidth="140.0" text="Color" />
                                         <TableColumn fx:id="matColWeight" text="Weight (g)" />
-                                        <TableColumn fx:id="matColDiameter" prefWidth="101.0" text="Diameter (mm)" />
+                                        <TableColumn fx:id="matColDiameter" prefWidth="101.0" text="Diameter" />
                                         <TableColumn fx:id="matColPrice" prefWidth="89.0" text="Price" />
                                         <TableColumn fx:id="matColShipping" prefWidth="70.0" text="Shipping" />
                                         <TableColumn fx:id="matColUsed" minWidth="7.0" text="Used (%)" />
@@ -629,7 +620,7 @@
                                         <TableColumn fx:id="matColSoldFor" prefWidth="70.0" text="Sold For" />
                                         <TableColumn fx:id="matColProfit" text="Profit" />
                                         <TableColumn fx:id="matColSeller" prefWidth="140.0" text="Seller" />
-                                        <TableColumn fx:id="matColPurchDate" minWidth="7.0" prefWidth="100.0" text="Purchase Date" />
+                                        <TableColumn fx:id="matColPurchDate" minWidth="100.0" prefWidth="100.0" text="Purchase Date" />
                                         <TableColumn fx:id="matColComment" prefWidth="140.0" text="Comment" />
                                     </columns>
                                 </TableView>
@@ -665,7 +656,7 @@
                                 </HBox>
                             </top>
                      <right>
-                        <VBox prefHeight="773.0" prefWidth="305.0" spacing="5.0" BorderPane.alignment="CENTER">
+                        <VBox fx:id="matvbox" prefHeight="773.0" prefWidth="305.0" spacing="5.0" BorderPane.alignment="CENTER">
                            <children>
                               <ScrollPane maxHeight="1500.0" prefHeight="1500.0" prefWidth="295.0" style="-fx-background-color: transparent;">
                                  <content>
@@ -683,11 +674,11 @@
                                                 <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                              </rowConstraints>
                                              <children>
-                                                <Button fx:id="ordersBtnNew111" mnemonicParsing="false" prefWidth="295.0" text="New Material" GridPane.columnSpan="2" />
-                                                <Button fx:id="btnCancelOrder111" mnemonicParsing="false" prefWidth="150.0" text="Delete Material(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                <Button fx:id="btnOrdersFilters111" mnemonicParsing="false" prefWidth="295.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                                <Button fx:id="btnNewOrderFrom111" mnemonicParsing="false" prefWidth="150.0" text="Edit Material" GridPane.rowIndex="1" />
-                                                <Button fx:id="order_btn_refresh111" mnemonicParsing="false" prefWidth="295.0" text="Refresh" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                                <Button fx:id="matBtnNew" mnemonicParsing="false" prefWidth="295.0" text="New Material" GridPane.columnSpan="2" />
+                                                <Button fx:id="matBtnDelete" mnemonicParsing="false" prefWidth="150.0" text="Delete Material(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Button fx:id="matBtnDetails" mnemonicParsing="false" prefWidth="295.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                <Button fx:id="matBtnEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Material" GridPane.rowIndex="1" />
+                                                <Button fx:id="matBtnRefresh" mnemonicParsing="false" prefWidth="295.0" text="Refresh" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                                              </children>
                                              <VBox.margin>
                                                 <Insets />
@@ -750,7 +741,7 @@
                                                 <RowConstraints minHeight="10.0" prefHeight="18.0" vgrow="SOMETIMES" />
                                              </rowConstraints>
                                              <children>
-                                                <Label fx:id="matLabelSelectedTotal1111" text="Total (0)" GridPane.columnSpan="2" GridPane.halignment="CENTER">
+                                                <Label fx:id="matLabelTotal" text="Total (0)" GridPane.columnSpan="2" GridPane.halignment="CENTER">
                                                    <font>
                                                       <Font name="System Bold" size="20.0" />
                                                    </font>
@@ -759,27 +750,27 @@
                                                 <Label text="Trash" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="20" />
                                                 <Label text="Average Roll Buy/Sold Price" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="17" />
                                                 <Label text="Remaining Weight/Rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="14" />
-                                                <Label text="99/99" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="24">
+                                                <Label fx:id="matLabelTotalColorsTypes" text="99/99" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="24">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="99 999g" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="21">
+                                                <Label fx:id="matLabelTotalTrash" text="99 999g" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="21">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="1 234$/1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="18">
+                                                <Label fx:id="matLabelTotalAvgRollPrice" text="1 234$/1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="18">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="15">
+                                                <Label fx:id="matLabelTotalRemainingWeightRolls" text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="15">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label fx:id="matLabelSelectedTotal11112" text="Selected (0)" textFill="#1400ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="26">
+                                                <Label fx:id="matLabelSelected" text="Selected (0)" textFill="#1400ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="26">
                                                    <font>
                                                       <Font name="System Bold" size="20.0" />
                                                    </font>
@@ -789,27 +780,27 @@
                                                 <Label text="Total Weight/Rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="34" />
                                                 <Label text="Revenue/Profit" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="31" />
                                                 <Label text="Shipping/Price (Total)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="28" />
-                                                <Label text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="41">
+                                                <Label fx:id="matLabelSelectedRemainingWeightRolls" text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="41">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="38">
+                                                <Label fx:id="matLabelSelectedSoldWeightRolls" text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="38">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="35">
+                                                <Label fx:id="matLabelSelectedWeightRolls" text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="35">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="1 234$/1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="32">
+                                                <Label fx:id="matLabelSelectedRevenueProfit" text="1 234$/1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="32">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="29">
+                                                <Label fx:id="matLabelSelectedShippingPriceTotal" text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="29">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
@@ -818,34 +809,34 @@
                                                 <Label text="Total Weight/Rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
                                                 <Label text="Sold Weight/Rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="11" />
                                                 <Label text="Revenue/Profit" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
-                                                <Label text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="12">
+                                                <Label fx:id="matLabelTotalSoldWeightRolls" text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="12">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9">
+                                                <Label fx:id="matLabelTotalWeightRolls" text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="1 234$/1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6">
+                                                <Label fx:id="matLabelTotalRevenueProfit" text="1 234$/1 234$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                                                <Label fx:id="matLabelTotalShippingPriceTotal" text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="Average Roll Buy/Sold Price" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="46" />
+                                                <Label text="Trash" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="46" />
                                                 <Label text="Average Roll Buy/Sold Price" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="43" />
-                                                <Label text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="47">
+                                                <Label fx:id="matLabelSelectedTrash" text="99 999g" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="47">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="99.9kg/100  rolls" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="44">
+                                                <Label fx:id="matLabelSelectedAvgRollPrice" text="99$/roll" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="44">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
@@ -925,11 +916,11 @@
                                                 <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                              </rowConstraints>
                                              <children>
-                                                <Button fx:id="ordersBtnNew1111" mnemonicParsing="false" prefWidth="295.0" text="New Printer" GridPane.columnSpan="2" />
-                                                <Button fx:id="btnCancelOrder1111" mnemonicParsing="false" prefWidth="150.0" text="Delete Printer(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                <Button fx:id="btnOrdersFilters1111" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                                <Button fx:id="btnNewOrderFrom1111" mnemonicParsing="false" prefWidth="150.0" text="Edit Printer" GridPane.rowIndex="1" />
-                                                <Button fx:id="order_btn_refresh1111" mnemonicParsing="false" prefWidth="305.0" text="Refresh" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                                <Button fx:id="printersBtnNew" mnemonicParsing="false" prefWidth="295.0" text="New Printer" GridPane.columnSpan="2" />
+                                                <Button fx:id="printersBtnDelete" mnemonicParsing="false" prefWidth="150.0" text="Delete Printer(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Button fx:id="printersBtnDetails" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                <Button fx:id="printersBtnEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Printer" GridPane.rowIndex="1" />
+                                                <Button fx:id="printersBtnRefresh" mnemonicParsing="false" prefWidth="305.0" text="Refresh" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                                              </children>
                                              <VBox.margin>
                                                 <Insets />
@@ -989,24 +980,24 @@
                                                 <RowConstraints minHeight="10.0" prefHeight="18.0" vgrow="SOMETIMES" />
                                              </rowConstraints>
                                              <children>
-                                                <Label fx:id="matLabelSelectedTotal11112" text="Total (0)" GridPane.columnSpan="2" GridPane.halignment="CENTER">
+                                                <Label fx:id="printersLabelTotal" text="Total (0)" GridPane.columnSpan="2" GridPane.halignment="CENTER">
                                                    <font>
                                                       <Font name="System Bold" size="20.0" />
                                                    </font>
                                                 </Label>
                                                 <Label text="Items Printed" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="20" />
                                                 <Label text="Printers Incomes" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="17" />
-                                                <Label text="9 999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="21">
+                                                <Label fx:id="printersLabelTotalItemsPrinted" text="9 999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="21">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="18">
+                                                <Label fx:id="printersLabelTotalIncomes" text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="18">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label fx:id="matLabelSelectedTotal111121" text="Selected (0)" textFill="#1400ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="23">
+                                                <Label fx:id="printersLabelSelected" text="Selected (0)" textFill="#1400ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="23">
                                                    <font>
                                                       <Font name="System Bold" size="20.0" />
                                                    </font>
@@ -1016,27 +1007,27 @@
                                                 <Label text="Total Price of Printers" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="31" />
                                                 <Label text="Duty/Tax (Total)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="28" />
                                                 <Label text="Shipping/Price (Total)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="25" />
-                                                <Label text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="38">
+                                                <Label fx:id="printersLabelSelectedPriceInclExpenses" text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="38">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="35">
+                                                <Label fx:id="printersLabelSelectedExpenses" text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="35">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="32">
+                                                <Label fx:id="printersLabelSelectedPriceOfPrinters" text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="32">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="29">
+                                                <Label fx:id="printersLabelSelectedDutyTaxTotal" text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="29">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="26">
+                                                <Label fx:id="printersLabelSelectedShippingPriceTotal" text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="26">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
@@ -1045,40 +1036,40 @@
                                                 <Label text="Total Price of Printers" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
                                                 <Label text="Printers Expenses" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="11" />
                                                 <Label text="Duty/Tax (Total)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
-                                                <Label text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="12">
+                                                <Label fx:id="printersLabelTotalExpenses" text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="12">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9">
+                                                <Label fx:id="printersLabelTotalPriceOfPrinters" text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6">
+                                                <Label fx:id="printersLabelTotalDutyTaxTotal" text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                                                <Label fx:id="printersLabelTotalShippingPriceTotal" text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
                                                 <Label text="Items Printed" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="43" />
                                                 <Label text="Printers Incomes" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="40" />
-                                                <Label text="9 999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="44">
+                                                <Label fx:id="printersLabelSelectedItemsPrinted" text="9 999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="44">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="41">
+                                                <Label fx:id="printersLabelSelectedIncomes" text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="41">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Label>
                                                 <Label text="Price of printers inc. Expenses" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="14" />
-                                                <Label text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="15">
+                                                <Label fx:id="printersLabelTotalPriceInclExpenses" text="99 999$" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="15">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
@@ -1144,11 +1135,11 @@
                                     <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <Button fx:id="ordersBtnNew112" mnemonicParsing="false" prefWidth="295.0" text="New Cost" GridPane.columnSpan="2" />
-                                    <Button fx:id="btnCancelOrder112" mnemonicParsing="false" prefWidth="150.0" text="Delete Cost(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <Button fx:id="btnOrdersFilters112" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                    <Button fx:id="btnNewOrderFrom112" mnemonicParsing="false" prefWidth="150.0" text="Edit Cost" GridPane.rowIndex="1" />
-                                    <Button fx:id="order_btn_refresh112" mnemonicParsing="false" prefWidth="305.0" text="Refresh" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                    <Button fx:id="costsBtnNew" mnemonicParsing="false" prefWidth="295.0" text="New Cost" GridPane.columnSpan="2" />
+                                    <Button fx:id="costsBtnNewDelete" mnemonicParsing="false" prefWidth="150.0" text="Delete Cost(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Button fx:id="costsBtnNewDetails" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                    <Button fx:id="costsBtnNewEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Cost" GridPane.rowIndex="1" />
+                                    <Button fx:id="costsBtnNewRefresh" mnemonicParsing="false" prefWidth="305.0" text="Refresh" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                                  </children>
                               </GridPane>
                               <Region prefHeight="50.0" VBox.vgrow="ALWAYS" />
@@ -1176,36 +1167,36 @@
                                     <RowConstraints minHeight="10.0" prefHeight="18.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <Label fx:id="matLabelSelectedTotal111121" text="Total (0)" GridPane.columnSpan="2" GridPane.halignment="CENTER">
+                                    <Label fx:id="costsLabelTotal" text="Total (0)" GridPane.columnSpan="2" GridPane.halignment="CENTER">
                                        <font>
                                           <Font name="System Bold" size="20.0" />
                                        </font>
                                     </Label>
-                                    <Label fx:id="matLabelSelectedTotal1111211" text="Selected (0)" textFill="#1400ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9">
+                                    <Label fx:id="costsLabelSelected" text="Selected (0)" textFill="#1400ff" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9">
                                        <font>
                                           <Font name="System Bold" size="20.0" />
                                        </font>
                                     </Label>
                                     <Label text="Quantity" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="14" />
                                     <Label text="Shipping/Price (Total)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="11" />
-                                    <Label text="9 999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="15">
+                                    <Label fx:id="costsLabelSelectedQuantity" text="9 999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="15">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="12">
+                                    <Label fx:id="costsLabelSelectedShippingPriceTotal" text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="12">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
                                     <Label text="Shipping/Price (Total)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                                     <Label text="Quantity" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
-                                    <Label text="9 999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6">
+                                    <Label fx:id="costsLabelTotalQuantity" text="9 999" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                                    <Label fx:id="costsLabelTotalShippingPriceTotal" text="1 234$/1 234$ (1 234$)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
