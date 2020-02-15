@@ -234,7 +234,7 @@ public class ControllerMain implements Initializable {
     private Button printersBtnNew, printersBtnDelete, printersBtnDetails, printersBtnEdit, printersBtnRefresh;
 
     @FXML
-    private Label printersLabelSelectedTotal, printersLabelTotal, printersLabelTotalItemsPrinted, printersLabelTotalIncomes, printersLabelSelected, printersLabelSelectedPriceInclExpenses,
+    private Label printersLabelSelectedTotal, printersLabelTotal, printersLabelTotalItemsPrinted, printersLabelTotalIncomesProfit, printersLabelSelected, printersLabelSelectedPriceInclExpenses,
             printersLabelSelectedExpenses, printersLabelSelectedPriceOfPrinters, printersLabelSelectedDutyTaxTotal, printersLabelSelectedShippingPriceTotal, printersLabelTotalExpenses,
             printersLabelTotalPriceOfPrinters, printersLabelTotalDutyTaxTotal, printersLabelTotalShippingPriceTotal, printersLabelSelectedItemsPrinted, printersLabelSelectedIncomes,
             printersLabelTotalPriceInclExpenses;
@@ -372,6 +372,8 @@ public class ControllerMain implements Initializable {
     //Since data in database table are not the same as in table views, we have to complete these data.
     //Regarding costs  table view it is only printer name.
     //This method uses table of printers and id of printer stored in listOfCosts to get and set printer name for particular Cost object
+    //We can set here labels for total costs only, not for selected, because we are looping all entries.
+    //And because we cannot change UI elements from other thread tha man javaFX thread, we will do it in Platform.runLater() method.
     private void completeListOfCosts(){
 
         int total = listOfCosts.size(), totalQuantity = 0;
@@ -388,8 +390,8 @@ public class ControllerMain implements Initializable {
 
         int finalTotalQuantity = totalQuantity;
 
-        double finalPrice = PrintedAPI.round(price, 2);
-        double finalShipping = PrintedAPI.round(shipping, 2);
+        double finalPrice = PrintedAPI.round(price);
+        double finalShipping = PrintedAPI.round(shipping);
 
         Platform.runLater(() -> {
             costsLabelTotal.setText("Total (" + listOfCosts.size() + ")");
@@ -406,12 +408,12 @@ public class ControllerMain implements Initializable {
     /*****************************          PRINTERS METHODS         *****************************/
     //use this to display any list of costs - for example filtered or result of search
     public void displayPrinters(ObservableList<Printer> printers) {
-        completeListOfPrinters();
         printersTv.setItems(printers);
     }
 
     //display current list of costs saved in global variable.
     public void displayPrinters() {
+        completeListOfPrinters();
         printersTv.setItems(listOfPrinters);
     }
 
@@ -421,6 +423,12 @@ public class ControllerMain implements Initializable {
         //We can get number of sold items and incomes by searching listOfOrderItems.
         //We can get expenses by searching listOfCosts
         //We can get overall Incomes by subtracting costs from incomes
+
+        //declaration of variables used for labels
+        int itemsPrinted = 0;
+
+        double shipping = 0, price = 0, duty = 0, tax = 0, totalPrice = 0, totalExpenses = 0, priceInclExpenses = 0, printersIncome = 0;
+
         for (Printer printer : listOfPrinters) {
 
             int printerId = printer.getId();
@@ -431,7 +439,8 @@ public class ControllerMain implements Initializable {
                 if (printerId == orderItem.getPrinter().getId()) {
                     printer.setItemsSold(printer.getItemsSold() + orderItem.getObject().getSoldCount());
                     incomes = printer.getIncomes() + orderItem.getObject().getSoldPrice();
-                    printer.setIncomes(PrintedAPI.round(incomes, 2));
+                    printer.setIncomes(PrintedAPI.round(incomes));
+                    itemsPrinted += orderItem.getObject().getSoldCount();
                 }
             }
 
@@ -439,15 +448,49 @@ public class ControllerMain implements Initializable {
             for (Cost cost : listOfCosts) {
                 if (printerId == cost.getPrinterId()) {
                     expenses = printer.getExpenses() + cost.getShipping() + cost.getPrice();
-                    printer.setExpenses(PrintedAPI.round(expenses, 2));
+                    printer.setExpenses(PrintedAPI.round(expenses));
                 }
 
             }
 
             overallIncome = incomes - expenses;
-            printer.setOverallIncome(PrintedAPI.round(overallIncome, 2));
+            printer.setOverallIncome(PrintedAPI.round(overallIncome));
+            printer.setType(SimpleTableObject.getSimpleTableObjectByPropId(commonMaterialProperties, printer.getTypeID()).getPropertyName());
+
+            //calculation for "Total" labels
+            shipping += printer.getShipping();
+            price += printer.getPrice();
+            duty += printer.getDuty();
+            tax += printer.getTax();
+            totalPrice += printer.getShipping() + printer.getPrice() + printer.getDuty() + printer.getTax();
+            totalExpenses += printer.getExpenses();
+            printersIncome += printer.getIncomes();
+
 
         }
+
+        priceInclExpenses += totalPrice + totalExpenses;
+
+        double finalShipping = PrintedAPI.round(shipping);
+        double finalPrice = PrintedAPI.round(price);
+        double finalDuty = PrintedAPI.round(duty);
+        double finalTax = PrintedAPI.round(tax);
+        double finalTotalPrice = PrintedAPI.round(totalPrice);
+        double finalTotalExpenses = PrintedAPI.round(totalExpenses);
+        double finalPriceInclExpenses = PrintedAPI.round(priceInclExpenses);
+        double finalPrintersIncome = PrintedAPI.round(printersIncome);
+        int finalItemsPrinted = itemsPrinted;
+
+        Platform.runLater(() -> {
+            printersLabelTotal.setText("Total (" + listOfPrinters.size() + ")");
+            printersLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f $)", finalShipping, finalPrice, finalShipping + finalPrice));
+            printersLabelTotalDutyTaxTotal.setText(String.format("%.2f $/%.2f $ ( %.2f $)", finalDuty, finalTax, finalDuty + finalTax));
+            printersLabelTotalPriceOfPrinters.setText(finalTotalPrice + " $");
+            printersLabelTotalExpenses.setText(finalTotalExpenses + " $");
+            printersLabelTotalPriceInclExpenses.setText(finalPriceInclExpenses + " $");
+            printersLabelTotalIncomesProfit.setText(String.format("%.2f $ (%.2f $)", finalPrintersIncome, finalPrintersIncome - finalPriceInclExpenses));
+            printersLabelTotalItemsPrinted.setText(finalItemsPrinted + "");
+        });
     }
 
 
@@ -491,8 +534,8 @@ public class ControllerMain implements Initializable {
             material.setManufacturer(manufacturer);
             material.setSeller(seller);
 
-            material.setWeight(PrintedAPI.round(weight, 2));
-            material.setDiameter(PrintedAPI.round(diameter, 2));
+            material.setWeight(PrintedAPI.round(weight));
+            material.setDiameter(PrintedAPI.round(diameter));
 
             //setting used, remaining, trash, soldFor and profit
             for (OrderItem orderItem : listOfOrderItems) {
@@ -506,10 +549,10 @@ public class ControllerMain implements Initializable {
                 }
             }
 
-            material.setUsed(PrintedAPI.round(used/weight*100, 2));
-            material.setRemaining(PrintedAPI.round(weight-used, 2));
-            material.setSoldFor(PrintedAPI.round(soldFor, 2));
-            material.setProfit(PrintedAPI.round(soldFor - material.getPrice(), 2));
+            material.setUsed(PrintedAPI.round(used/weight*100));
+            material.setRemaining(PrintedAPI.round(weight-used));
+            material.setSoldFor(PrintedAPI.round(soldFor));
+            material.setProfit(PrintedAPI.round(soldFor - material.getPrice()));
         }
     }
 
@@ -705,15 +748,6 @@ public class ControllerMain implements Initializable {
                         updateMessage("All done.");
                         updateProgress(max, max);
 
-//                        Platform.runLater(new Runnable(){
-//                            @Override
-//                            public void run() {
-//                                calculateSelectedCostsStatistics();
-//                            }
-//                        });
-                        calculateSelectedCostsStatistics();
-
-
                         progressBar.setVisible(false);
 
                     } catch (NullPointerException e) {
@@ -731,14 +765,7 @@ public class ControllerMain implements Initializable {
 
     /*****************************          INITIALIZE COSTS TAB          *****************************/
     costsBtnNew.setOnAction((event) -> {
-        displayCosts();
-//        System.out.println("Costs: " + listOfCosts.size());
-//        System.out.println("Printers: " + listOfPrinters.size());
-//        System.out.println("Materials: " + listOfMaterials.size());
-//        System.out.println("Objects: " + listOfObjects.size());
-//        System.out.println("Customers: " + listOfCustomers.size());
-//        System.out.println("Orders: " + listOfOrders.size());
-//        System.out.println("OrderItems: " + listOfOrderItems.size());
+
 
     });
     /*****************************          INITIALIZE PRINTERS TAB          *****************************/
