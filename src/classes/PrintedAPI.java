@@ -49,10 +49,31 @@ public class PrintedAPI {
         return newTime;
     }
 
+    //converting minutes into days, hours and minutes -> input: 2600; output: 1d 19h 20m
+    public static String formatTimeToDays (int time){
+//        String newTime;
+//
+//        int days = time % 1440;
+//        int hours = (time - days*1440) / 60; //since both are ints, you get an int
+//        int minutes = time - days*1440 -  % 60;
+//
+//        newTime = String.format("%dh %02dm", hours, minutes);
+        return time/24/60 + "d " + time/60%24 + "h " + time%60 + "m";
+        //return newTime;
+    }
+
     //method for rounding double numbers
     public static double round(double value) {
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
+    //method for rounding double numbers
+    public static double round(double value, int places) {
+        BigDecimal bd = new BigDecimal(value);
+
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
 }

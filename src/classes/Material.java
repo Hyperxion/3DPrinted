@@ -216,7 +216,11 @@ public class Material {
 //        this.weight = null;
     }
 
+    public boolean isSold(){
+        if(this.getFinished() == "Sold")return true;
 
+        return false;
+    }
 
     public int getId() {
         return id.get();
