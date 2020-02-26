@@ -1,5 +1,7 @@
 package classes;
 
+import com.zaxxer.hikari.HikariDataSource;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -7,6 +9,10 @@ import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
@@ -76,4 +82,112 @@ public class PrintedAPI {
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
+
+    public static boolean areComboBoxesEmpty(ComboBox... comboboxes) {
+
+        boolean isEmpty = false;
+
+        for (int i = 0; i < comboboxes.length; i++) {
+            ComboBox combobox = comboboxes[i];
+            if(combobox.getSelectionModel().isEmpty())isEmpty = true;
+        }
+
+        return isEmpty;
+    }
+
+    public static boolean areTxtFieldsEmpty(TextField... textfields) {
+
+        boolean isEmpty = false;
+
+        for (int i = 0; i < textfields.length; i++) {
+            TextField textfield = textfields[i];
+            if(textfield.lengthProperty().get() == 0)isEmpty = true;
+        }
+
+        return isEmpty;
+    }
+
+    //use this to test values of prices, shippings... to test if they are greater than 0
+    public static boolean isGreaterThanZero(double... doubles){
+        for (double number : doubles) {
+            if (number <= 0)return false;
+        }
+
+        return true;
+    }
+
+    //use this to test values of build times, quantities... to test if they are greater than 0
+    public static boolean isGreaterThanZero(int... integers){
+        for (double number : integers) {
+            if (number <= 0)return false;
+        }
+        return true;
+    }
+
+    //checks text fields for apostrophes. String cannot contain apostrophes, otherwise UPDATE or INSERT
+    //query will fail. It must be escaped by another apostrophe.
+    public static void checkApostrophe(TextField... textfields) {
+
+        for (int i = 0; i < textfields.length; i++) {
+            TextField textfield = textfields[i];
+            String text = textfield.getText();
+            if(text.contains("'"))textfield.setText(text.replace("'", "''"));
+        }
+
+    }
+
+    public static int getCurrentAutoIncrementValue(HikariDataSource ds, String tableName) {
+        int currentAutoIncrementValue = 0;
+
+        //Create query
+        String query = "SELECT AUTO_INCREMENT FROM  INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA ='" + ds.getUsername() + "' AND   TABLE_NAME   ='" + tableName + "'";
+
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+
+            //STEP 2: Register JDBC driver
+            Class.forName("org.mariadb.jdbc.Driver");
+
+            //STEP 3: Open a connection
+
+            conn = ds.getConnection();
+            //STEP 4: Execute a query
+            stmt = conn.createStatement();
+
+            rs = stmt.executeQuery(query);
+            //Query is executed, resultSet saved. Now we need to process the data
+            //rs.next() loads row
+            //in this loop we sequentialy add columns to list of Strings
+            while(rs.next()){
+
+                currentAutoIncrementValue = rs.getInt("AUTO_INCREMENT");
+
+            }
+            rs.close();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null)
+                    conn.close();
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
+    return currentAutoIncrementValue;
+    }
+
 }

@@ -99,6 +99,78 @@ public class Printer {
         return printers;
     }
 
+    public static void insertUpdatePrinter(Printer printer, HikariDataSource ds){
+        //Create query
+        String updateQuery;
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            //STEP 2: Register JDBC driver
+            Class.forName("org.mariadb.jdbc.Driver");
+
+            //STEP 3: Open a connection
+
+            conn = ds.getConnection();
+            //STEP 4: Execute a query
+
+
+            updateQuery = "INSERT INTO Printers (PrinterID,PrinterName,PrinterPrice,Comment,PrinterShipping,PrinterTypeID,PurchaseDate,Duty,Tax) VALUES (?,?,?,?,?,?,?,?,?) "
+                    + "ON DUPLICATE KEY UPDATE PrinterID=?,PrinterName=?,PrinterPrice=?,Comment=?,PrinterShipping=?,PrinterTypeID=?,PurchaseDate=?,Duty=?,Tax=?";
+            stmt = conn.prepareStatement(updateQuery);
+
+            int i = 0;
+
+            stmt.setInt(++i, printer.getId());
+            stmt.setString(++i, printer.getName());
+            stmt.setDouble(++i, printer.getPrice());
+            stmt.setString(++i, printer.getComment());
+            stmt.setDouble(++i, printer.getShipping());
+            stmt.setInt(++i, printer.getTypeID());
+            stmt.setString(++i, printer.getPurchaseDate());
+            stmt.setDouble(++i, printer.getDuty());
+            stmt.setDouble(++i, printer.getTax());
+
+            stmt.setInt(++i, printer.getId());
+            stmt.setString(++i, printer.getName());
+            stmt.setDouble(++i, printer.getPrice());
+            stmt.setString(++i, printer.getComment());
+            stmt.setDouble(++i, printer.getShipping());
+            stmt.setInt(++i, printer.getTypeID());
+            stmt.setString(++i, printer.getPurchaseDate());
+            stmt.setDouble(++i, printer.getDuty());
+            stmt.setDouble(++i, printer.getTax());
+
+            stmt.executeUpdate();
+
+            stmt.close();
+            conn.close();
+        } catch (SQLNonTransientConnectionException se) {
+            se.printStackTrace();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null)
+                    conn.close();
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
+    }
+
     //constructor for creating Printer from information stored in database table "Printers"
     public Printer(SimpleIntegerProperty id, SimpleIntegerProperty typeID, SimpleStringProperty name, SimpleStringProperty purchaseDate, SimpleStringProperty comment, SimpleDoubleProperty shipping, SimpleDoubleProperty price, SimpleDoubleProperty duty, SimpleDoubleProperty tax) {
         this.id = id;

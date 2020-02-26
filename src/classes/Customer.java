@@ -12,7 +12,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Label;
 
 public class Customer {
 
@@ -25,8 +24,6 @@ public class Customer {
     private SimpleIntegerProperty orderCount;
     private SimpleDoubleProperty ordersPrice;
 
-
-
     public static ObservableList<Customer> downloadCustomersTable(HikariDataSource ds){
 
         //Create list
@@ -37,7 +34,7 @@ public class Customer {
 
         Connection conn = null;
         Statement stmt = null;
-        ResultSet rs = null;
+        ResultSet rs;
         try {
 
             //STEP 2: Register JDBC driver
@@ -79,23 +76,19 @@ public class Customer {
             }
 
             rs.close();
-        } catch (NullPointerException e){
+        } catch (NullPointerException | SQLNonTransientConnectionException | ClassNotFoundException e){
             //signIn(event);
             e.printStackTrace();
-        } catch (SQLNonTransientConnectionException se) {
-            se.printStackTrace();
         } catch (SQLException se) {
             //Handle errors for JDBC
             se.printStackTrace();
-        } catch (ClassNotFoundException se) {
-            //Handle errors for Class.forName
-            se.printStackTrace();
-        } finally {
+        } //Handle errors for Class.forName
+        finally {
             //finally block used to close resources
             try {
                 if (stmt != null)
                     conn.close();
-            } catch (SQLException se) {
+            } catch (SQLException ignored) {
             }// do nothing
             try {
                 if (conn != null)
@@ -109,6 +102,80 @@ public class Customer {
         return customersList;
     }
 
+    public static void insertUpdateCust(Customer customer, HikariDataSource ds){
+
+        //Create query
+        String updateQuery;
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            //STEP 2: Register JDBC driver
+            Class.forName("org.mariadb.jdbc.Driver");
+
+            //STEP 3: Open a connection
+
+            conn = ds.getConnection();
+            //STEP 4: Execute a query
+
+            updateQuery = "INSERT INTO Customers (CustomerID,FirstName,LastName,DateCreated,Comment,Phone,Address,City,Mail,ZipCode,CountryID,CompanyID)" +
+                    "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)" +
+                    "ON DUPLICATE KEY UPDATE CustomerID=?,FirstName=?,LastName=?,DateCreated=?,Comment=?,Phone=?,Address=?,City=?,Mail=?,ZipCode=?,CountryID=?,CompanyID=?";
+            stmt = conn.prepareStatement(updateQuery);
+
+            int i = 0;
+
+            stmt.setInt(++i, customer.getId());
+            stmt.setString(++i, customer.getFirstName());
+            stmt.setString(++i, customer.getLastName());
+            stmt.setString(++i, customer.getDateCreated());
+            stmt.setString(++i, customer.getComment());
+            stmt.setString(++i, customer.getPhone());
+            stmt.setString(++i, customer.getAddress());
+            stmt.setString(++i, customer.getCity());
+            stmt.setString(++i, customer.getMail());
+            stmt.setString(++i, customer.getZipCode());
+            stmt.setInt(++i, customer.getCountryId());
+            stmt.setInt(++i, customer.getCompanyId());
+
+            stmt.setInt(++i, customer.getId());
+            stmt.setString(++i, customer.getFirstName());
+            stmt.setString(++i, customer.getLastName());
+            stmt.setString(++i, customer.getDateCreated());
+            stmt.setString(++i, customer.getComment());
+            stmt.setString(++i, customer.getPhone());
+            stmt.setString(++i, customer.getAddress());
+            stmt.setString(++i, customer.getCity());
+            stmt.setString(++i, customer.getMail());
+            stmt.setString(++i, customer.getZipCode());
+            stmt.setInt(++i, customer.getCountryId());
+            stmt.setInt(++i, customer.getCompanyId());
+
+            stmt.executeUpdate();
+
+            stmt.close();
+            conn.close();
+        } //Handle errors for JDBC
+        catch (Exception se) {
+            se.printStackTrace();
+        }//Handle errors for Class.forName
+        finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null)
+                    conn.close();
+            } catch (SQLException ignored) {
+            }// do nothing
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try         
+    }
 
     public Customer(SimpleStringProperty lastName, SimpleStringProperty firstName, SimpleStringProperty dateCreated, SimpleStringProperty mail, SimpleStringProperty phone, SimpleStringProperty address, SimpleStringProperty city, SimpleStringProperty zipCode, SimpleStringProperty comment, SimpleIntegerProperty id, SimpleIntegerProperty companyId, SimpleIntegerProperty countryId) {
         this.lastName = lastName;
@@ -123,10 +190,10 @@ public class Customer {
         this.id = id;
         this.companyId = companyId;
         this.countryId = countryId;
-        this.country = new SimpleStringProperty("null");;
-        this.company = new SimpleStringProperty("null");;
+        this.country = new SimpleStringProperty("null");
+        this.company = new SimpleStringProperty("null");
         this.orderCount = new SimpleIntegerProperty(0);
-        this.ordersPrice = new SimpleDoubleProperty(0);;
+        this.ordersPrice = new SimpleDoubleProperty(0);
     }
 
     public String getLastName() {
@@ -320,4 +387,6 @@ public class Customer {
     public void setOrdersPrice(double ordersPrice) {
         this.ordersPrice.set(ordersPrice);
     }
+
+
 }

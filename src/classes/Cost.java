@@ -98,6 +98,75 @@ public class Cost {
         this.printerName = new SimpleStringProperty();
     }
 
+    public static void insertUpdateCost(Cost cost, HikariDataSource ds) {
+        //Create query
+        String updateQuery;
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            //STEP 2: Register JDBC driver
+            Class.forName("org.mariadb.jdbc.Driver");
+
+            //STEP 3: Open a connection
+
+            conn = ds.getConnection();
+            //STEP 4: Execute a query
+
+
+            updateQuery = "INSERT INTO Costs (CostID,CostName,CostQuantity,CostShipping,Comment,CostPrice,PrinterID) VALUES (?,?,?,?,?,?,?) "
+                    + "ON DUPLICATE KEY UPDATE CostID=?,CostName=?,CostQuantity=?,CostShipping=?,Comment=?,CostPrice=?,PrinterID=?";
+            stmt = conn.prepareStatement(updateQuery);
+
+            int i = 0;
+
+            stmt.setInt(++i, cost.getId());//Cost id
+            stmt.setString(++i, cost.getName());//Cost name
+            stmt.setInt(++i, cost.getQuantity());//quantity
+            stmt.setDouble(++i,cost.getShipping());//shipping
+            stmt.setString(++i, cost.getComment());//comment
+            stmt.setDouble(++i, cost.getPrice());//price
+            stmt.setInt(++i, cost.getPrinterId());//printerId
+
+            stmt.setInt(++i, cost.getId());//Cost id
+            stmt.setString(++i, cost.getName());//Cost name
+            stmt.setInt(++i, cost.getQuantity());//quantity
+            stmt.setDouble(++i,cost.getShipping());//shipping
+            stmt.setString(++i, cost.getComment());//comment
+            stmt.setDouble(++i, cost.getPrice());//price
+            stmt.setInt(++i, cost.getPrinterId());//printerId
+
+            stmt.executeUpdate();
+
+            stmt.close();
+            conn.close();
+        } catch (SQLNonTransientConnectionException se) {
+           se.printStackTrace();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null)
+                    conn.close();
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
+
+    }
+
     public int getId() {
         return id.get();
     }

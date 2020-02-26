@@ -121,12 +121,12 @@ public class OrderItem {
         return orderItems;
     }
 
-    public OrderItem(SimpleIntegerProperty id, SimpleIntegerProperty orderId, Object obj1, Material mat1, Printer printer1) {
+    public OrderItem(SimpleIntegerProperty id, SimpleIntegerProperty orderId, Object obj, Material mat, Printer printer) {
         this.id = id;
         this.orderId = orderId;
-        this.object = obj1;
-        this.material = mat1;
-        this.printer = printer1;
+        this.object = obj;
+        this.material = mat;
+        this.printer = printer;
     }
 
     public int getId() {

@@ -3,6 +3,8 @@ package controller.main;
 import classes.*;
 import classes.Object;
 import com.zaxxer.hikari.HikariDataSource;
+import controller.create.*;
+import controller.create.order.ControllerCreateOrder;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -10,9 +12,16 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import org.omg.CORBA.MARSHAL;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -71,6 +80,165 @@ public class ControllerMain implements Initializable {
 
     @FXML
     private Label labelMainInfo;
+
+    /*****************************          COSTS VARIABLES       *****************************/
+    private ObservableList<Cost> listOfCosts = FXCollections.observableArrayList();
+
+    @FXML
+    private Tab costsTab;
+
+    @FXML
+    private TableView<Cost> costsTv;
+
+    @FXML
+    private Button costsBtnCreate, costsBtnDelete, costsBtnDetails, costsBtnEdit, costsBtnRefresh;
+
+    @FXML
+    private Label costsLabelSelected, costsLabelTotal, costsLabelSelectedQuantity, costsLabelSelectedShippingPriceTotal, costsLabelTotalQuantity, costsLabelTotalShippingPriceTotal;
+
+    @FXML
+    private TableColumn<Cost, Integer> costsColId, costsColQuantity, costsColPrinterID;
+
+    @FXML
+    private TableColumn<Cost, String> costsColName, costsColPurchaseDate, costsColComment, costsColPrinterName;
+
+    @FXML
+    private TableColumn<Cost, Double> costsColPrice, costsColShipping;
+
+    /*****************************          PRINTERS VARIABLES       *****************************/
+    private ObservableList<Printer> listOfPrinters = FXCollections.observableArrayList();
+
+    @FXML
+    private Tab printersTab;
+
+    @FXML
+    private TableView<Printer> printersTv;
+
+    @FXML
+    private Button printersBtnCreate, printersBtnDelete, printersBtnDetails, printersBtnEdit, printersBtnRefresh;
+
+    @FXML
+    private Label printersLabelSelectedTotal, printersLabelTotal, printersLabelTotalItemsPrinted, printersLabelTotalIncomesProfit, printersLabelSelected, printersLabelSelectedPriceInclExpenses,
+            printersLabelSelectedExpenses, printersLabelSelectedPriceOfPrinters, printersLabelSelectedDutyTaxTotal, printersLabelSelectedShippingPriceTotal, printersLabelTotalExpenses,
+            printersLabelTotalPriceOfPrinters, printersLabelTotalDutyTaxTotal, printersLabelTotalShippingPriceTotal, printersLabelSelectedItemsPrinted, printersLabelSelectedIncomesProfit,
+            printersLabelTotalPriceInclExpenses;
+
+    @FXML
+    private TableColumn<Printer, Integer> printersColId, printersColItemsSold;
+
+    @FXML
+    private TableColumn<Printer, String> printersColName, printersColPurchaseDate, printersColComment, printersColType;
+
+    @FXML
+    private TableColumn<Printer, Double> printersColPrice, printersColShipping, printersColDuty, printersColTax, printersColIncomes, printersColExpenses, printersColOverallIncome;
+
+    /*****************************          MATERIALS VARIABLES       *****************************/
+    private ObservableList<Material> listOfMaterials = FXCollections.observableArrayList();
+
+    @FXML
+    private Tab materialsTab;
+
+    @FXML
+    private TableView<Material> matTv;
+
+    @FXML
+    private Button matBtnCreate, matBtnDelete, matBtnDetails, matBtnEdit, matBtnRefresh;
+
+    @FXML
+    private Label matLabelSelectedTotal, matLabelTotal, matLabelTotalColorsTypes, matLabelTotalTrash, matLabelTotalAvgRollBuySellPrice, matLabelTotalRemainingWeightRolls, matLabelSelected,
+            matLabelSelectedRemainingWeightRolls, matLabelSelectedSoldWeightRolls, matLabelSelectedWeightRolls, matLabelSelectedRevenueProfit, matLabelSelectedShippingPriceTotal,
+            matLabelTotalSoldWeightRolls, matLabelTotalWeightRolls, matLabelTotalRevenueProfit, matLabelTotalShippingPriceTotal, matLabelSelectedTrash, matLabelSelectedAvgRollBuySellPrice;
+
+    @FXML
+    private TableColumn<Material, String> matColColor, matColManufacturer, matColType, matColFinished, matColSeller, matColPurchDate, matColComment;
+
+    @FXML
+    private TableColumn<Material, Integer> matColId;
+
+    @FXML
+    private TableColumn<Material, Double> matColRemaining, matColWeight, matColPrice, matColShipping, matColUsed, matColTrash, matColSoldFor, matColProfit, matColDiameter;
+
+    /*****************************          OBJECTS VARIABLES       *****************************/
+    private ObservableList<Object> listOfObjects = FXCollections.observableArrayList();
+
+    @FXML
+    private Tab objTab;
+
+    @FXML
+    private TableView<Object> objTv;
+
+    @FXML
+    private Button objBtnCreate, objBtnDelete, objBtnDetails, objBtnEdit, objBtnRefresh;
+
+    @FXML
+    private Label objLabelSelectedTotal, objLabelTotal, objLabelSelected, objLabelSelectedWeights, objLabelSelectedPriceCostsProfit, objLabelSelectedTimesPrinted, objLabelSelectedBuildTime, objLabelSelectedPerHour;
+
+    @FXML
+    private TableColumn<Object, String> objColName, objColStlLink, objColBuildTimeFormatted, objColComment;
+
+    @FXML
+    private TableColumn<Object, Integer> objColId, objColCount;
+
+    @FXML
+    private TableColumn<classes.Object, Double> objColWeight, objColSupportWeight, objColSoldPrice, objColCosts;
+
+    /*****************************          CUSTOMERS VARIABLES       *****************************/
+    private ObservableList<Customer> listOfCustomers = FXCollections.observableArrayList();
+
+    @FXML
+    private Tab custTab;
+
+    @FXML
+    private TableView<Customer> custTv;
+
+    @FXML
+    private Button custBtnCreate, custBtnDelete, custBtnDetails, custBtnEdit, custBtnRefresh;
+
+    @FXML
+    private Label custLabelTotal, custLabelSelected, custLabelSelectedCosts, custLabelSelectedPrice, custLabelSelectedItemsPrinted, custLabelSelectedOrders, custLabelSelectedWeights,
+            custLabelSelectedPerHour, custLabelSelectedBuildTime;
+
+    @FXML
+    private TableColumn<Customer, String> custColLastName, custColFirstName, custColDateCreated, custColMail, custColPhone, custColAddress, custColCity, custColZipCode, custColCountry, custColCompany, custColComment;
+
+    @FXML
+    private TableColumn<Customer, Integer> custColId, custColOrderCount;
+
+    @FXML
+    private TableColumn<Customer, Double> custColOrdersPrice;
+
+    /*****************************          ORDERS VARIABLES       *****************************/
+    private ObservableList<Order> listOfOrders = FXCollections.observableArrayList();
+
+    @FXML
+    private Tab ordersTab;
+
+    @FXML
+    private TableView<Order> ordersTv;
+
+    @FXML
+    private Button ordersBtnCreate, ordersBtnMarkNotSold, ordersBtnCancel, ordersBtnMarkSold, ordersBtnCreateFrom, ordersBtnRefresh, ordersBtnEdit, ordersBtnDelete;
+
+    @FXML
+    private Label ordersLabelSold, ordersLabelSoldPriceCostsProfit, ordersLabelNotSold,
+            ordersLabelNotSoldPriceCostsProfit, ordersLabelTotal, ordersLabelTotalItemsPrinted, ordersLabelTotalBuildTime, ordersLabelTotalWeightSupports,
+            ordersLabelTotalPerHour, ordersLabelTotalPriceCostsProfit, ordersLabelSelected, ordersLabelSelectedBuildTime, ordersLabelSelectedItemsPrinted,
+            ordersLabelSelectedWeightSupports, ordersLabelSelectedPerHour, ordersLabelSelectedPriceCostsProfit;
+
+    @FXML
+    private TableColumn<Order, String> ordersColCustomer, ordersColStatus, ordersColComment, ordersColDateCreated, ordersColDueDate, ordersColTotalBuildTimeFormatted;
+
+    @FXML
+    private TableColumn<Order, Integer> ordersColCustomerID, ordersColOrderId, ordersColTotalQuantity;
+
+    @FXML
+    private TableColumn<Order, Double> ordersColTotalPrice, ordersColTotalCosts, ordersColTotalWeight, ordersColTotalSupportWeight;
+
+    /*****************************          ORDER ITEMS VARIABLES       *****************************/
+    private ObservableList<OrderItem> listOfOrderItems = FXCollections.observableArrayList();
+
+
+    /*****************************          GENERAL METHODS       *****************************/
 
     //setCellValueFactory for or columns in costs table view
     public void initializeCols(){
@@ -195,168 +363,6 @@ public class ControllerMain implements Initializable {
         PrintedAPI.centerColumns(ordersTv.getColumns());
         ordersTv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
-
-
-
-    /*****************************          COSTS VARIABLES       *****************************/
-    private ObservableList<Cost> listOfCosts = FXCollections.observableArrayList();
-
-    @FXML
-    private Tab costsTab;
-
-    @FXML
-    private TableView<Cost> costsTv;
-
-    @FXML
-    private Button costsBtnNew, costsBtnNewDelete, costsBtnNewDetails, costsBtnNewEdit, costsBtnNewRefresh;
-
-    @FXML
-    private Label costsLabelSelected, costsLabelTotal, costsLabelSelectedQuantity, costsLabelSelectedShippingPriceTotal, costsLabelTotalQuantity, costsLabelTotalShippingPriceTotal;
-
-    @FXML
-    private TableColumn<Cost, Integer> costsColId, costsColQuantity, costsColPrinterID;
-
-    @FXML
-    private TableColumn<Cost, String> costsColName, costsColPurchaseDate, costsColComment, costsColPrinterName;
-
-    @FXML
-    private TableColumn<Cost, Double> costsColPrice, costsColShipping;
-
-    /*****************************          PRINTERS VARIABLES       *****************************/
-    private ObservableList<Printer> listOfPrinters = FXCollections.observableArrayList();
-
-    @FXML
-    private Tab printersTab;
-
-    @FXML
-    private TableView<Printer> printersTv;
-
-    @FXML
-    private Button printersBtnNew, printersBtnDelete, printersBtnDetails, printersBtnEdit, printersBtnRefresh;
-
-    @FXML
-    private Label printersLabelSelectedTotal, printersLabelTotal, printersLabelTotalItemsPrinted, printersLabelTotalIncomesProfit, printersLabelSelected, printersLabelSelectedPriceInclExpenses,
-            printersLabelSelectedExpenses, printersLabelSelectedPriceOfPrinters, printersLabelSelectedDutyTaxTotal, printersLabelSelectedShippingPriceTotal, printersLabelTotalExpenses,
-            printersLabelTotalPriceOfPrinters, printersLabelTotalDutyTaxTotal, printersLabelTotalShippingPriceTotal, printersLabelSelectedItemsPrinted, printersLabelSelectedIncomesProfit,
-            printersLabelTotalPriceInclExpenses;
-
-    @FXML
-    private TableColumn<Printer, Integer> printersColId, printersColItemsSold;
-
-    @FXML
-    private TableColumn<Printer, String> printersColName, printersColPurchaseDate, printersColComment, printersColType;
-
-    @FXML
-    private TableColumn<Printer, Double> printersColPrice, printersColShipping, printersColDuty, printersColTax, printersColIncomes, printersColExpenses, printersColOverallIncome;
-
-    /*****************************          MATERIALS VARIABLES       *****************************/
-    private ObservableList<Material> listOfMaterials = FXCollections.observableArrayList();
-
-    @FXML
-    private Tab materialsTab;
-
-    @FXML
-    private TableView<Material> matTv;
-
-    @FXML
-    private Button matBtnNew, matBtnDelete, matBtnDetails, matBtnEdit, matBtnRefresh;
-
-    @FXML
-    private Label matLabelSelectedTotal, matLabelTotal, matLabelTotalColorsTypes, matLabelTotalTrash, matLabelTotalAvgRollBuySellPrice, matLabelTotalRemainingWeightRolls, matLabelSelected,
-            matLabelSelectedRemainingWeightRolls, matLabelSelectedSoldWeightRolls, matLabelSelectedWeightRolls, matLabelSelectedRevenueProfit, matLabelSelectedShippingPriceTotal,
-            matLabelTotalSoldWeightRolls, matLabelTotalWeightRolls, matLabelTotalRevenueProfit, matLabelTotalShippingPriceTotal, matLabelSelectedTrash, matLabelSelectedAvgRollBuySellPrice;
-
-    @FXML
-    private TableColumn<Material, String> matColColor, matColManufacturer, matColType, matColFinished, matColSeller, matColPurchDate, matColComment;
-
-    @FXML
-    private TableColumn<Material, Integer> matColId;
-
-    @FXML
-    private TableColumn<Material, Double> matColRemaining, matColWeight, matColPrice, matColShipping, matColUsed, matColTrash, matColSoldFor, matColProfit, matColDiameter;
-
-    /*****************************          OBJECTS VARIABLES       *****************************/
-    private ObservableList<Object> listOfObjects = FXCollections.observableArrayList();
-
-    @FXML
-    private Tab objTab;
-
-    @FXML
-    private TableView<Object> objTv;
-
-    @FXML
-    private Button objBtnNew, objBtnDelete, objBtnDetails, objBtnEdit, objBtnRefresh;
-
-    @FXML
-    private Label objLabelSelectedTotal, objLabelTotal, objLabelSelected, objLabelSelectedWeights, objLabelSelectedPriceCostsProfit, objLabelSelectedTimesPrinted, objLabelSelectedBuildTime, objLabelSelectedPerHour;
-
-    @FXML
-    private TableColumn<Object, String> objColName, objColStlLink, objColBuildTimeFormatted, objColComment;
-
-    @FXML
-    private TableColumn<Object, Integer> objColId, objColCount;
-
-    @FXML
-    private TableColumn<classes.Object, Double> objColWeight, objColSupportWeight, objColSoldPrice, objColCosts;
-
-    /*****************************          CUSTOMERS VARIABLES       *****************************/
-    private ObservableList<Customer> listOfCustomers = FXCollections.observableArrayList();
-
-    @FXML
-    private Tab custTab;
-
-    @FXML
-    private TableView<Customer> custTv;
-
-    @FXML
-    private Button custBtnNew, custBtnDelete, custBtnDetails, custBtnEdit, custBtnRefresh;
-
-    @FXML
-    private Label custLabelTotal, custLabelSelected, custLabelSelectedCosts, custLabelSelectedPrice, custLabelSelectedItemsPrinted, custLabelSelectedOrders, custLabelSelectedWeights,
-            custLabelSelectedPerHour, custLabelSelectedBuildTime;
-
-    @FXML
-    private TableColumn<Customer, String> custColLastName, custColFirstName, custColDateCreated, custColMail, custColPhone, custColAddress, custColCity, custColZipCode, custColCountry, custColCompany, custColComment;
-
-    @FXML
-    private TableColumn<Customer, Integer> custColId, custColOrderCount;
-
-    @FXML
-    private TableColumn<Customer, Double> custColOrdersPrice;
-
-    /*****************************          ORDERS VARIABLES       *****************************/
-    private ObservableList<Order> listOfOrders = FXCollections.observableArrayList();
-
-    @FXML
-    private Tab ordersTab;
-
-    @FXML
-    private TableView<Order> ordersTv;
-
-    @FXML
-    private Button ordersBtnNew, ordersBtnMarkNotSold, ordersBtnCancel, ordersBtnMarkSold, ordersBtnNewFrom, ordersBtnRefresh, ordersBtnEdit, ordersBtnDelete;
-
-    @FXML
-    private Label ordersLabelSold, ordersLabelSoldPriceCostsProfit, ordersLabelNotSold,
-            ordersLabelNotSoldPriceCostsProfit, ordersLabelTotal, ordersLabelTotalItemsPrinted, ordersLabelTotalBuildTime, ordersLabelTotalWeightSupports,
-            ordersLabelTotalPerHour, ordersLabelTotalPriceCostsProfit, ordersLabelSelected, ordersLabelSelectedBuildTime, ordersLabelSelectedItemsPrinted,
-            ordersLabelSelectedWeightSupports, ordersLabelSelectedPerHour, ordersLabelSelectedPriceCostsProfit;
-
-    @FXML
-    private TableColumn<Order, String> ordersColCustomer, ordersColStatus, ordersColComment, ordersColDateCreated, ordersColDueDate, ordersColTotalBuildTimeFormatted;
-
-    @FXML
-    private TableColumn<Order, Integer> ordersColCustomerID, ordersColOrderId, ordersColTotalQuantity;
-
-    @FXML
-    private TableColumn<Order, Double> ordersColTotalPrice, ordersColTotalCosts, ordersColTotalWeight, ordersColTotalSupportWeight;
-
-    /*****************************          ORDER ITEMS VARIABLES       *****************************/
-    private ObservableList<OrderItem> listOfOrderItems = FXCollections.observableArrayList();
-
-
-    /*****************************          GENERAL METHODS       *****************************/
-
 
     /*****************************          COSTS METHODS         *****************************/
     //use this to display any list of costs - for example filtered or result of search
@@ -1118,6 +1124,8 @@ public class ControllerMain implements Initializable {
                     try {
                         int i = -1, max = 12;
 
+                        progressBar.setVisible(true);
+
                         updateProgress(i, 6);
                         updateMessage("Downloading has just started, my " + userTitle);
 
@@ -1202,27 +1210,159 @@ public class ControllerMain implements Initializable {
         calculateSelectedCostsStatistics(costsTv.getSelectionModel().getSelectedItems());
     });
 
-    costsBtnNew.setOnAction((event) -> {
+    costsBtnCreate.setOnAction((event) -> {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/create/ViewCreateCost.fxml"));
+            Parent root1 = fxmlLoader.load();
+            ControllerCreateCost ctrl = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("New Cost");
+            stage.setMinHeight(440);
+            stage.setMinWidth(400);
 
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.centerOnScreen();
+
+
+            //passing credentials to main controller
+            ctrl.setDs(ds);
+            ctrl.setControllerMain(this);
+            ctrl.setFieldsValues();
+            stage.show();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     });
+
     /*****************************          INITIALIZE PRINTERS TAB          *****************************/
     printersTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Printer> c) -> {
         calculateSelectedPrintersStatistics(printersTv.getSelectionModel().getSelectedItems());
     });
+
+    printersBtnCreate.setOnAction(event -> {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/create/ViewCreatePrinter.fxml"));
+            Parent root1 = fxmlLoader.load();
+            ControllerCreatePrinter ctrl = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("New Printer");
+            //stage.setMinHeight(440);
+            //stage.setMinWidth(506);
+
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.centerOnScreen();
+
+
+            //passing credentials to main controller
+            ctrl.setDs(ds);
+            ctrl.setControllerMain(this);
+            ctrl.setFieldsValues();
+            stage.show();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    });
+
 
     /*****************************          INITIALIZE MATERIALS TAB          *****************************/
     matTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Material> c) -> {
         calculateSelectedMaterialsStatistics(matTv.getSelectionModel().getSelectedItems());
     });
 
+    matBtnCreate.setOnAction((event) -> {
+            try{
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/create/ViewCreateMaterial.fxml"));
+                Parent root1 = fxmlLoader.load();
+                ControllerCreateMaterial ctrl = fxmlLoader.getController();
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setTitle("New Material");
+                stage.setMinHeight(440);
+                stage.setMinWidth(400);
+
+                stage.setScene(new Scene(root1));
+                stage.setResizable(false);
+                stage.centerOnScreen();
+
+
+                //passing credentials to main controller
+                ctrl.setDs(ds);
+                ctrl.setControllerMain(this);
+                ctrl.setFieldsValues();
+                stage.show();
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        });
+
     /*****************************          INITIALIZE OBJECTS TAB          *****************************/
     objTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Object> c) -> {
         calculateSelectedObjectsStatistics(objTv.getSelectionModel().getSelectedItems());
     });
 
+    objBtnCreate.setOnAction(event -> {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/create/ViewCreateObject.fxml"));
+            Parent root1 = fxmlLoader.load();
+            ControllerCreateObject ctrl = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("New Object");
+            //stage.setMinHeight(440);
+            //stage.setMinWidth(506);
+
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.centerOnScreen();
+
+
+            //passing credentials to main controller
+            ctrl.setDs(ds);
+            ctrl.setControllerMain(this);
+            ctrl.setFieldsValues();
+            stage.show();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    });
     /*****************************          INITIALIZE CUSTOMERS TAB          *****************************/
     custTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Customer> c) -> {
         calculateSelectedCustomersStatistics(custTv.getSelectionModel().getSelectedItems());
+    });
+
+    custBtnCreate.setOnAction(event -> {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/create/ViewCreateCustomer.fxml"));
+            Parent root1 = fxmlLoader.load();
+            ControllerCreateCustomer ctrl = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("New Customer");
+            //stage.setMinHeight(440);
+            //stage.setMinWidth(506);
+
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.centerOnScreen();
+
+
+            //passing credentials to main controller
+            ctrl.setDs(ds);
+            ctrl.setControllerMain(this);
+            ctrl.setFieldsValues();
+            stage.show();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     });
 
     /*****************************          INITIALIZE ORDERS TAB          *****************************/
@@ -1230,8 +1370,83 @@ public class ControllerMain implements Initializable {
         calculateSelectedOrdersStatistics(ordersTv.getSelectionModel().getSelectedItems());
     });
 
+    ordersBtnCreate.setOnAction(event -> {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/create/order/ViewCreateOrder.fxml"));
+            Parent root1 = fxmlLoader.load();
+            ControllerCreateOrder ctrl = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("New Object");
+            //stage.setMinHeight(440);
+            //stage.setMinWidth(506);
+
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.centerOnScreen();
+            stage.show();
+
+            //passing credentials to main controller
+            ctrl.setDs(ds);
+            ctrl.setControllerMain(this);
+            ctrl.setFieldsValues();
+
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    });
+
     }//end of initialize();
+
+    public Label getLabelMainInfo() {
+        return labelMainInfo;
+    }
+
+    public ObservableList<SimpleTableObject> getCommonCustomerProperties() {
+        return commonCustomerProperties;
+    }
+
+    public ObservableList<SimpleTableObject> getCommonMaterialProperties() {
+        return commonMaterialProperties;
+    }
+
+    public ObservableList<SimpleTableObject> getCommonCustomerPropertyTypes() {
+        return commonCustomerPropertyTypes;
+    }
+
+    public ObservableList<SimpleTableObject> getCommonMaterialPropertyTypes() {
+        return commonMaterialPropertyTypes;
+    }
+
+    public ObservableList<SimpleTableObject> getCommonOrderStatus() {
+        return commonOrderStatus;
+    }
+
     /*************************          GETTERS & SETTERS          *************************/
+
+    public ObservableList<Customer> getListOfCustomers() {
+        return listOfCustomers;
+    }
+
+    public ObservableList<Object> getListOfObjects() {
+        return listOfObjects;
+    }
+
+    public ObservableList<Material> getListOfNotSpentMaterials() {
+
+        ObservableList<Material> notSpentMaterials = FXCollections.observableArrayList();
+
+        for (Material mat : listOfMaterials){
+            if (mat.getFinished().equals("No"))notSpentMaterials.add(mat);
+        }
+
+        return notSpentMaterials;
+    }
+
+    public ObservableList<Printer> getListOfPrinters() {
+        return listOfPrinters;
+    }
 
     public void setDataSource(HikariDataSource ds) {
         this.ds = ds;
@@ -1247,5 +1462,29 @@ public class ControllerMain implements Initializable {
 
     public Service getServiceDownloadAllTables() {
         return serviceDownloadAllTables;
+    }
+
+    public TableView<Cost> getCostsTv() {
+        return costsTv;
+    }
+
+    public TableView<Printer> getPrintersTv() {
+        return printersTv;
+    }
+
+    public TableView<Material> getMatTv() {
+        return matTv;
+    }
+
+    public TableView<Object> getObjTv() {
+        return objTv;
+    }
+
+    public TableView<Customer> getCustTv() {
+        return custTv;
+    }
+
+    public TableView<Order> getOrdersTv() {
+        return ordersTv;
     }
 }

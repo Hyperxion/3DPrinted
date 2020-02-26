@@ -115,7 +115,7 @@
                                                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                         </rowConstraints>
                                                         <children>
-                                                            <Button fx:id="ordersBtnNew" mnemonicParsing="false" prefWidth="295.0" text="New Order" GridPane.columnSpan="2" />
+                                                            <Button fx:id="ordersBtnCreate" mnemonicParsing="false" prefWidth="295.0" text="New Order" GridPane.columnSpan="2" />
                                                             <Button fx:id="ordersBtnMarkNotSold" layoutX="110.0" layoutY="13.0" mnemonicParsing="false" prefWidth="150.0" text="Mar As Not Sold" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                                             <Button fx:id="ordersBtnCancel" mnemonicParsing="false" prefWidth="150.0" text="Cancel Order(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                             <Button fx:id="ordersBtnMarkSold" mnemonicParsing="false" prefWidth="150.0" text="Mark As Sold" GridPane.rowIndex="2" />
@@ -354,7 +354,7 @@
                                     <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <Button fx:id="custBtnNew" mnemonicParsing="false" prefWidth="295.0" text="New Customer" GridPane.columnSpan="2" />
+                                    <Button fx:id="custBtnCreate" mnemonicParsing="false" prefWidth="295.0" text="New Customer" GridPane.columnSpan="2" />
                                     <Button fx:id="custBtnDelete" mnemonicParsing="false" prefWidth="150.0" text="Delete Customer(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                     <Button fx:id="custBtnDetails" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                     <Button fx:id="custBtnEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Customer" GridPane.rowIndex="1" />
@@ -510,7 +510,7 @@
                                     <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <Button fx:id="objBtnNew" mnemonicParsing="false" prefWidth="295.0" text="New Object" GridPane.columnSpan="2" />
+                                    <Button fx:id="objBtnCreate" mnemonicParsing="false" prefWidth="295.0" text="New Object" GridPane.columnSpan="2" />
                                     <Button fx:id="objBtnDelete" mnemonicParsing="false" prefWidth="150.0" text="Delete Object(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                     <Button fx:id="objBtnDetails" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                     <Button fx:id="objBtnEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Object" GridPane.rowIndex="1" />
@@ -674,7 +674,7 @@
                                                 <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                              </rowConstraints>
                                              <children>
-                                                <Button fx:id="matBtnNew" mnemonicParsing="false" prefWidth="295.0" text="New Material" GridPane.columnSpan="2" />
+                                                <Button fx:id="matBtnCreate" mnemonicParsing="false" prefWidth="295.0" text="New Material" GridPane.columnSpan="2" />
                                                 <Button fx:id="matBtnDelete" mnemonicParsing="false" prefWidth="150.0" text="Delete Material(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                 <Button fx:id="matBtnDetails" mnemonicParsing="false" prefWidth="295.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                 <Button fx:id="matBtnEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Material" GridPane.rowIndex="1" />
@@ -916,7 +916,7 @@
                                                 <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                              </rowConstraints>
                                              <children>
-                                                <Button fx:id="printersBtnNew" mnemonicParsing="false" prefWidth="295.0" text="New Printer" GridPane.columnSpan="2" />
+                                                <Button fx:id="printersBtnCreate" mnemonicParsing="false" prefWidth="295.0" text="New Printer" GridPane.columnSpan="2" />
                                                 <Button fx:id="printersBtnDelete" mnemonicParsing="false" prefWidth="150.0" text="Delete Printer(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                 <Button fx:id="printersBtnDetails" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                 <Button fx:id="printersBtnEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Printer" GridPane.rowIndex="1" />
@@ -1135,7 +1135,7 @@
                                     <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <Button fx:id="costsBtnNew" mnemonicParsing="false" prefWidth="295.0" text="New Cost" GridPane.columnSpan="2" />
+                                    <Button fx:id="costsBtnCreate" mnemonicParsing="false" prefWidth="295.0" text="New Cost" GridPane.columnSpan="2" />
                                     <Button fx:id="costsBtnNewDelete" mnemonicParsing="false" prefWidth="150.0" text="Delete Cost(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                     <Button fx:id="costsBtnNewDetails" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                     <Button fx:id="costsBtnNewEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Cost" GridPane.rowIndex="1" />

@@ -26,6 +26,46 @@ public class Order {
     private ObservableList<OrderItem> orderItems;
     private Customer customer;
 
+    //this constructor is used for loading of orders directly from database
+    public Order(SimpleIntegerProperty id, SimpleIntegerProperty customerId, SimpleIntegerProperty buildTime, SimpleIntegerProperty quantity, SimpleStringProperty status, SimpleStringProperty comment, SimpleStringProperty dateCreated, SimpleStringProperty dueDate, SimpleDoubleProperty costs, SimpleDoubleProperty price, SimpleDoubleProperty weight, SimpleDoubleProperty supportWeight) {
+        this.id = id;
+        this.customerId = customerId;
+        this.buildTime = buildTime;
+        this.quantity = quantity;
+        this.status = status;
+        this.comment = comment;
+        this.dateCreated = dateCreated;
+        this.dueDate = dueDate;
+        this.costs = costs;
+        this.price = price;
+        this.weight = weight;
+        this.supportWeight = supportWeight;
+        this.customerName = new SimpleStringProperty("Dunno");
+        this.buildTimeFormatted = PrintedAPI.formatTime(buildTime.get());
+        this.orderItems = null;
+        this.customer = null;
+    }
+
+    //this constructor is used only for purpose of inserting order into database table. Since we dont need customer name (we will use their id)
+    public Order(SimpleIntegerProperty id, Customer customer, SimpleIntegerProperty buildTime, SimpleIntegerProperty quantity, SimpleStringProperty status, SimpleStringProperty comment, SimpleStringProperty dateCreated, SimpleStringProperty dueDate, SimpleDoubleProperty costs, SimpleDoubleProperty price, SimpleDoubleProperty weight, SimpleDoubleProperty supportWeight, ObservableList<OrderItem> orderItems) {
+        this.id = id;
+        this.customerId = customer.idProperty();
+        this.buildTime = buildTime;
+        this.quantity = quantity;
+        this.status = status;
+        this.comment = comment;
+        this.dateCreated = dateCreated;
+        this.dueDate = dueDate;
+        this.costs = costs;
+        this.price = price;
+        this.weight = weight;
+        this.supportWeight = supportWeight;
+        this.customerName = null;
+        this.buildTimeFormatted = PrintedAPI.formatTime(buildTime.get());
+        this.orderItems = orderItems;
+        this.customer = null;
+    }
+
     public static ObservableList<Order> downloadOrdersTable(HikariDataSource ds) {
 
         //Create list
@@ -110,23 +150,8 @@ public class Order {
         return orders;
     }
 
-    public Order(SimpleIntegerProperty id, SimpleIntegerProperty customerId, SimpleIntegerProperty buildTime, SimpleIntegerProperty quantity, SimpleStringProperty status, SimpleStringProperty comment, SimpleStringProperty dateCreated, SimpleStringProperty dueDate, SimpleDoubleProperty costs, SimpleDoubleProperty price, SimpleDoubleProperty weight, SimpleDoubleProperty supportWeight) {
-        this.id = id;
-        this.customerId = customerId;
-        this.buildTime = buildTime;
-        this.quantity = quantity;
-        this.status = status;
-        this.comment = comment;
-        this.dateCreated = dateCreated;
-        this.dueDate = dueDate;
-        this.costs = costs;
-        this.price = price;
-        this.weight = weight;
-        this.supportWeight = supportWeight;
-        this.customerName = new SimpleStringProperty("Dunno");
-        this.buildTimeFormatted = PrintedAPI.formatTime(buildTime.get());
-        this.orderItems = null;
-        this.customer = null;
+    public static void insertUpdateOrder(Order newOrder, HikariDataSource ds){
+
     }
 
     public int getId() {

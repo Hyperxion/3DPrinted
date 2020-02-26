@@ -140,13 +140,13 @@ public class SimpleTableObject {
             //in this loop we sequentialy add columns to list of Strings
             while(rs.next()){
 
-                SimpleIntegerProperty property_id, property_type_id;
+                SimpleIntegerProperty property_type_id;
                 SimpleStringProperty property_type_name;
 
-                property_id = new SimpleIntegerProperty(rs.getInt("PropertyTypeID"));
+                property_type_id = new SimpleIntegerProperty(rs.getInt("PropertyTypeID"));
                 property_type_name = new SimpleStringProperty(rs.getString("PropertyTypeName"));
 
-                SimpleTableObject property = new SimpleTableObject(property_id, null, property_type_name);
+                SimpleTableObject property = new SimpleTableObject(null, property_type_id, property_type_name);
 
                 types.add(property);
 
@@ -329,6 +329,19 @@ public class SimpleTableObject {
 
         return orderStatuses;
 
+    }
+
+    //this one will scan list of properties provided in "properties" input variable and remove all entries that does not
+    //match type.
+    public static ObservableList<SimpleTableObject> getListOfPropertiesByType(ObservableList<SimpleTableObject> properties, int type){
+
+        ObservableList<SimpleTableObject> filteredProperties = FXCollections.observableArrayList();
+
+        for(SimpleTableObject property : properties) {
+
+            if (property.getPropertyTypeId() == type)filteredProperties.add(property);
+        }
+        return filteredProperties;
     }
 
     public SimpleTableObject(SimpleIntegerProperty propertyId, SimpleIntegerProperty propertyTypeId, SimpleStringProperty propertyName) {

@@ -1,11 +1,9 @@
 package classes;
 
 import com.zaxxer.hikari.HikariDataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLNonTransientConnectionException;
-import java.sql.Statement;
+
+import java.sql.*;
+
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,6 +21,38 @@ public class Object {
     private SimpleStringProperty buildTimeFormatted;
     private SimpleIntegerProperty soldCount;
     private SimpleDoubleProperty soldPrice, costs;//field "costs" is used only for purpose of orderitem costs calculation
+
+    //general constructor  for objects from database
+    public Object(SimpleStringProperty name, SimpleStringProperty stlLink, SimpleStringProperty comment, SimpleIntegerProperty id, SimpleIntegerProperty buildTime, SimpleIntegerProperty projectId, SimpleDoubleProperty supportWeight, SimpleDoubleProperty weight) {
+        this.name = name;
+        this.stlLink = stlLink;
+        this.comment = comment;
+        this.id = id;
+        this.buildTime = buildTime;
+        this.projectId = projectId;
+        this.supportWeight = supportWeight;
+        this.weight = weight;
+        this.buildTimeFormatted = new SimpleStringProperty();
+        this.soldCount = new SimpleIntegerProperty(0);
+        this.soldPrice = new SimpleDoubleProperty(0);
+        this.costs = new SimpleDoubleProperty(0);
+    }
+
+    //constructor for creating printed object from information stored in orderItem
+    public Object(SimpleIntegerProperty objectId, SimpleIntegerProperty buildTime, SimpleDoubleProperty weight, SimpleDoubleProperty supportWeight, SimpleIntegerProperty soldCount, SimpleDoubleProperty price, SimpleDoubleProperty costs) {
+        this.name = new SimpleStringProperty("null");
+        this.stlLink = new SimpleStringProperty("null");
+        this.comment = new SimpleStringProperty("null");
+        this.id = objectId;
+        this.buildTime = buildTime;
+        this.projectId = new SimpleIntegerProperty(0);
+        this.supportWeight = supportWeight;
+        this.weight = weight;
+        this.buildTimeFormatted = PrintedAPI.formatTime(buildTime.get());
+        this.soldCount = soldCount;
+        this.soldPrice = price;
+        this.costs = costs;
+    }
 
     public static ObservableList<Object> downloadObjectsTable(HikariDataSource ds){
 
@@ -80,7 +110,7 @@ public class Object {
             //signIn(event);
             e.printStackTrace();
         } catch (SQLNonTransientConnectionException se) {
-           se.printStackTrace();
+            se.printStackTrace();
         } catch (SQLException se) {
             //Handle errors for JDBC
             se.printStackTrace();
@@ -105,36 +135,70 @@ public class Object {
         return objectList;
     }
 
-    //general constructor  for objects from database
-    public Object(SimpleStringProperty name, SimpleStringProperty stlLink, SimpleStringProperty comment, SimpleIntegerProperty id, SimpleIntegerProperty buildTime, SimpleIntegerProperty projectId, SimpleDoubleProperty supportWeight, SimpleDoubleProperty weight) {
-        this.name = name;
-        this.stlLink = stlLink;
-        this.comment = comment;
-        this.id = id;
-        this.buildTime = buildTime;
-        this.projectId = projectId;
-        this.supportWeight = supportWeight;
-        this.weight = weight;
-        this.buildTimeFormatted = null;
-        this.soldCount = new SimpleIntegerProperty(0);
-        this.soldPrice = new SimpleDoubleProperty(0);
-        this.costs = new SimpleDoubleProperty(0);;
-    }
+    public static void insertUpdateObject(Object newObject, HikariDataSource ds) {
+        //Create query
+        String updateQuery;
 
-    //constructor for creating printed object from information stored in orderItem
-    public Object(SimpleIntegerProperty objectId, SimpleIntegerProperty buildTime, SimpleDoubleProperty weight, SimpleDoubleProperty supportWeight, SimpleIntegerProperty soldCount, SimpleDoubleProperty price, SimpleDoubleProperty costs) {
-        this.name = new SimpleStringProperty("null");;
-        this.stlLink = new SimpleStringProperty("null");;
-        this.comment = new SimpleStringProperty("null");;
-        this.id = objectId;
-        this.buildTime = buildTime;
-        this.projectId = new SimpleIntegerProperty(0);;
-        this.supportWeight = supportWeight;
-        this.weight = weight;
-        this.buildTimeFormatted = PrintedAPI.formatTime(buildTime.get());
-        this.soldCount = soldCount;
-        this.soldPrice = price;
-        this.costs = costs;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            //STEP 2: Register JDBC driver
+            Class.forName("org.mariadb.jdbc.Driver");
+
+            //STEP 3: Open a connection
+
+            conn = ds.getConnection();
+            //STEP 4: Execute a query
+
+
+            updateQuery = "INSERT INTO Objects (ObjectID,ObjectName,ObjectWeight,SupportWeight,BuildTime,StlLink,Comment, ProjectID) VALUES (?,?,?,?,?,?,?,?) "
+                    + "ON DUPLICATE KEY UPDATE ObjectID=?,ObjectName=?,ObjectWeight=?,SupportWeight=?,BuildTime=?,StlLink=?,Comment=?,ProjectID=?";
+            stmt = conn.prepareStatement(updateQuery);
+
+            int i = 0;
+            
+            stmt.setInt(++i, newObject.getId());//id
+            stmt.setString(++i, newObject.getName());//name
+            stmt.setDouble(++i, newObject.getWeight());//weight
+            stmt.setDouble(++i, newObject.getSupportWeight());//supports
+            stmt.setInt(++i, newObject.getBuildTime());//buildtime
+            stmt.setString(++i, newObject.getStlLink());//stllink
+            stmt.setString(++i, newObject.getComment());//comment
+            stmt.setInt(++i, 1);//projectId
+
+            stmt.setInt(++i, newObject.getId());//id
+            stmt.setString(++i, newObject.getName());//name
+            stmt.setDouble(++i, newObject.getWeight());//weight
+            stmt.setDouble(++i, newObject.getSupportWeight());//supports
+            stmt.setInt(++i, newObject.getBuildTime());//buildtime
+            stmt.setString(++i, newObject.getStlLink());//stllink
+            stmt.setString(++i, newObject.getComment());//comment
+            stmt.setInt(++i, 1);//projectId
+
+            stmt.executeUpdate();
+
+            stmt.close();
+            conn.close();
+        } //Handle errors for JDBC
+        catch (Exception se) {
+            se.printStackTrace();
+        }//Handle errors for Class.forName
+        finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null)
+                    conn.close();
+            } catch (SQLException ignored) {
+            }// do nothing
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
     }
 
     public String getName() {

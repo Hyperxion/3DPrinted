@@ -1,6 +1,7 @@
 package classes;
 
 import com.zaxxer.hikari.HikariDataSource;
+import javafx.beans.binding.ObjectExpression;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -100,6 +101,84 @@ public class Material {
         }//end try
 
         return materials;
+    }
+
+    public static void insertUpdateMaterial(Material material, HikariDataSource ds){
+
+        //Create query
+        String updateQuery;
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            //STEP 2: Register JDBC driver
+            Class.forName("org.mariadb.jdbc.Driver");
+
+            //STEP 3: Open a connection
+
+            conn = ds.getConnection();
+            //STEP 4: Execute a query
+
+            updateQuery = "INSERT INTO Materials (MaterialID,ManufacturerID,MaterialTypeID,ColorID,WeightID,MaterialPrice,MaterialShipping,PurchaseDate,SellerID,Finished,DiameterID,Comment) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) "
+                    + "ON DUPLICATE KEY UPDATE MaterialID=?,ManufacturerID=?,MaterialTypeID=?,ColorID=?,WeightID=?,MaterialPrice=?,MaterialShipping=?,PurchaseDate=?,SellerID=?,Finished=?,DiameterID=?,Comment=?";
+            stmt = conn.prepareStatement(updateQuery);
+
+            int i = 0;
+
+            stmt.setInt(++i, material.getId()); //MaterialId
+            stmt.setInt(++i, material.getManufacturerId()); //ManufacturerId
+            stmt.setInt(++i, material.getTypeId()); //MaterialTypeId
+            stmt.setInt(++i, material.getColorId()); //colorId
+            stmt.setInt(++i, material.getWeightId());//weightId
+            stmt.setDouble(++i, material.getPrice());//price
+            stmt.setDouble(++i, material.getShipping());//shipping
+            stmt.setString(++i, material.getPurchaseDate());//purchase date
+            stmt.setInt(++i, material.getSellerId());//sellerid
+            stmt.setString(++i, material.getFinished());//finished
+            stmt.setInt(++i, material.getDiameterId());//diameterid
+            stmt.setString(++i, material.getComment());//comment
+
+            stmt.setInt(++i, material.getId()); //MaterialId
+            stmt.setInt(++i, material.getManufacturerId()); //ManufacturerId
+            stmt.setInt(++i, material.getTypeId()); //MaterialTypeId
+            stmt.setInt(++i, material.getColorId()); //colorId
+            stmt.setInt(++i, material.getWeightId());//weightId
+            stmt.setDouble(++i, material.getPrice());//price
+            stmt.setDouble(++i, material.getShipping());//shipping
+            stmt.setString(++i, material.getPurchaseDate());//purchase date
+            stmt.setInt(++i, material.getSellerId());//sellerid
+            stmt.setString(++i, material.getFinished());//finished
+            stmt.setInt(++i, material.getDiameterId());//diameterid
+            stmt.setString(++i, material.getComment());//comment
+
+            stmt.executeUpdate();
+
+            stmt.close();
+            conn.close();
+        } catch (SQLNonTransientConnectionException se) {
+            se.printStackTrace();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null)
+                    conn.close();
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
     }
 
     @Override
@@ -214,6 +293,14 @@ public class Material {
 //        this.profit = null;
 //        this.remaining = null;
 //        this.weight = null;
+    }
+
+    public static Material getMaterialById(ObservableList<Material> listOfMaterials, int id){
+
+        for (Material mat : listOfMaterials){
+            if (mat.getId() == id)return mat;
+        }
+        return null;
     }
 
     public boolean isSold(){
