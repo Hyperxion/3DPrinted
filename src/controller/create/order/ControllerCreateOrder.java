@@ -36,6 +36,7 @@ public class ControllerCreateOrder implements Initializable {
 
     private ObservableList<Material> listOfNotSpentMaterials;
     private ObservableList<Printer> listOfPrinters;
+    private ObservableList<OrderItem> orderItems = FXCollections.observableArrayList();
 
     private ToggleGroup toggleGroupStatus = new ToggleGroup();
 
@@ -102,10 +103,6 @@ public class ControllerCreateOrder implements Initializable {
             }
         });
 
-        tvSelectedObjects.getItems().addListener((ListChangeListener.Change<? extends OrderItem> c) -> {
-            calculateStats();
-        });
-
         btnAddObj.setOnAction(event -> {
             try{
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/create/order/ViewSelectObject.fxml"));
@@ -130,37 +127,35 @@ public class ControllerCreateOrder implements Initializable {
             }
         });
 
-//        tvSelectedObjects.setRowFactory( tv -> {
-//            TableRow<OrderItem> row = new TableRow<>();
-//            row.setOnMouseClicked(event -> {
-//                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-//                    try {
-//                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/select/SelectPrinterMaterialPrice.fxml"));
-//                        Parent root1 = fxmlLoader.load();
-//                        SelectPrinterMaterialPriceController ctrl = fxmlLoader.getController();
-//                        Stage stage = new Stage();
-//                        stage.initModality(Modality.APPLICATION_MODAL);
-//                        stage.setTitle("Assign Additional Information");
-//
-//                        stage.setScene(new Scene(root1));
-//                        stage.setResizable(false);
-//                        stage.centerOnScreen();
-//
-//                        stage.show();
-//                        //stage.setAlwaysOnTop(true);
-//                        ctrl.setDs(ds);
-//                        ctrl.setMainController(mainController);
-//                        ctrl.setNewOrderController(this);
-//                        ctrl.setFields(tv_orderObjects.getSelectionModel().getSelectedItem());
-//
-//                    }catch (IOException e){
-//
-//                    }
-//
-//                }
-//            });
-//            return row;
-//        });
+        tvSelectedObjects.setRowFactory( tv -> {
+            TableRow<OrderItem> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    try{
+                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/create/order/ViewSetAdditionalData.fxml"));
+                        Parent root1 = fxmlLoader.load();
+                        ControllerSetAdditionalData ctrl = fxmlLoader.getController();
+                        Stage stage = new Stage();
+                        stage.initModality(Modality.APPLICATION_MODAL);
+                        stage.setTitle("Set Additional Data");
+                        //stage.setMinHeight(440);
+                        //stage.setMinWidth(506);
+
+                        stage.setScene(new Scene(root1));
+                        stage.setResizable(false);
+                        stage.centerOnScreen();
+                        stage.show();
+
+                        ctrl.setControllerCreateOrder(this);
+                        ctrl.setFieldsValues(tvSelectedObjects.getSelectionModel().getSelectedItem());
+
+                    }catch (IOException e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            return row;
+        });
 
         btnCancel.setOnAction(event -> PrintedAPI.closeWindow(btnCancel));
 
@@ -172,6 +167,7 @@ public class ControllerCreateOrder implements Initializable {
         colName.setCellValueFactory((param) -> param.getValue().getObject().nameProperty());
         colQuantity.setCellValueFactory((param) -> param.getValue().getObject().soldCountProperty().asObject());
         colPrinterId.setCellValueFactory((param) -> param.getValue().getPrinter().idProperty().asObject());
+        colPrinter.setCellValueFactory((param) -> param.getValue().getPrinter().nameProperty());
         colBuildTimeFormatted.setCellValueFactory((param) -> param.getValue().getObject().buildTimeFormattedProperty());
         colMaterialID.setCellValueFactory((param) -> param.getValue().getMaterial().idProperty().asObject());
         colMaterialType.setCellValueFactory((param) -> param.getValue().getMaterial().typeProperty());
@@ -188,7 +184,7 @@ public class ControllerCreateOrder implements Initializable {
         tvSelectedObjects.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
-    private void calculateStats(){
+    protected void calculateStats(){
         double price = 0, weight = 0, supportWeight = 0, costs = 0;
         int buildTime = 0, quantity = 0;
 
@@ -203,13 +199,13 @@ public class ControllerCreateOrder implements Initializable {
             quantity += item.getObject().getSoldCount();
         }
 
-        labelWeight.setText(weight + " g");
-        labelSupportWeight.setText(supportWeight + " g");
+        labelWeight.setText(PrintedAPI.round(weight) + " g");
+        labelSupportWeight.setText(PrintedAPI.round(supportWeight) + " g");
         labelWeightSum.setText((weight + supportWeight) + " g");
         labelQuantity.setText(quantity + "");
         labelBuildTime.setText(PrintedAPI.formatTime(buildTime).get());
-        labelPrice.setText(price + " $");
-        labelCosts.setText(costs + " $");
+        labelPrice.setText(PrintedAPI.round(price) + " $");
+        labelCosts.setText(PrintedAPI.round(costs) + " $");
         labelProfit.setText((price - costs) + " $");
     }
 
@@ -315,9 +311,11 @@ public class ControllerCreateOrder implements Initializable {
         return controllerMain.getListOfNotSpentMaterials();
     }
 
-    public void setObjects(ObservableList<Object> selectedObjects) {
+    public ObservableList<Printer> getListOfPrinters(){
+        return controllerMain.getListOfPrinters();
+    }
 
-        ObservableList<OrderItem> items = FXCollections.observableArrayList();
+    public void setObjects(ObservableList<Object> selectedObjects) {
 
         for (Object obj : selectedObjects){
 
@@ -326,6 +324,9 @@ public class ControllerCreateOrder implements Initializable {
             Printer printer;
 
             obj.setBuildTimeFormatted(PrintedAPI.formatTime(obj.getBuildTime()).get());
+            obj.setSoldCount(1);
+            obj.setSoldPrice(0);
+            obj.setCosts(0);
 
             id = obj.idProperty();
             orderId = new SimpleIntegerProperty(Integer.parseInt(labelId.getText()));
@@ -334,10 +335,9 @@ public class ControllerCreateOrder implements Initializable {
             printer = listOfPrinters.get(0);
 
             OrderItem item = new OrderItem(id, orderId, obj, material, printer);
-            items.add(item);
+            orderItems.add(item);
 
         }
-
-        tvSelectedObjects.setItems(items);
+        tvSelectedObjects.setItems(orderItems);
     }
 }

@@ -32,7 +32,7 @@ public class Object {
         this.projectId = projectId;
         this.supportWeight = supportWeight;
         this.weight = weight;
-        this.buildTimeFormatted = new SimpleStringProperty();
+        this.buildTimeFormatted = PrintedAPI.formatTime(buildTime.get());
         this.soldCount = new SimpleIntegerProperty(0);
         this.soldPrice = new SimpleDoubleProperty(0);
         this.costs = new SimpleDoubleProperty(0);

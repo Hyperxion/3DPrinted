@@ -1,5 +1,6 @@
 package controller.create.order;
 
+import classes.Material;
 import classes.Object;
 import classes.PrintedAPI;
 import javafx.collections.FXCollections;
@@ -12,8 +13,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class ControllerSelectObject implements Initializable {
-    ControllerCreateOrder controllerCreateOrder = null;
-    ObservableList<Object> listOfObjects;
+
+    private ControllerCreateOrder controllerCreateOrder;
+    private ObservableList<Object> listOfObjects;
+    private ObservableList<Material> notSpentMaterials;
 
     @FXML
     private TableView<Object> tvObjects;
@@ -39,7 +42,9 @@ public class ControllerSelectObject implements Initializable {
 
         btnSelect.setOnAction(event -> {
             controllerCreateOrder.setObjects(tvObjects.getSelectionModel().getSelectedItems());
+            controllerCreateOrder.calculateStats();
             PrintedAPI.closeWindow(btnSelect);
+
         });
 
         btnClose.setOnAction(event -> PrintedAPI.closeWindow(btnClose));
