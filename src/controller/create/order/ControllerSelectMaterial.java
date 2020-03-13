@@ -37,6 +37,7 @@ public class ControllerSelectMaterial implements Initializable {
 
         btnSelect.setOnAction(event -> {
             controllerSetAdditionalData.setMaterial(tvMaterials.getSelectionModel().getSelectedItem());
+            controllerSetAdditionalData.calculateCosts();
             PrintedAPI.closeWindow(btnSelect);
         });
 

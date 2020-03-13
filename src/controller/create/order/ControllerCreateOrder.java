@@ -148,6 +148,8 @@ public class ControllerCreateOrder implements Initializable {
 
                         ctrl.setControllerCreateOrder(this);
                         ctrl.setFieldsValues(tvSelectedObjects.getSelectionModel().getSelectedItem());
+                        ctrl.calculateCosts(tvSelectedObjects.getSelectionModel().getSelectedItem());
+                        ctrl.unlockFields();
 
                     }catch (IOException e){
                         e.printStackTrace();
@@ -155,6 +157,10 @@ public class ControllerCreateOrder implements Initializable {
                 }
             });
             return row;
+        });
+
+        btnRemoveSelected.setOnAction(event -> {
+            System.out.println(tvSelectedObjects.getSelectionModel().getSelectedItem().getPrinter().getName());
         });
 
         btnCancel.setOnAction(event -> PrintedAPI.closeWindow(btnCancel));
@@ -339,5 +345,9 @@ public class ControllerCreateOrder implements Initializable {
 
         }
         tvSelectedObjects.setItems(orderItems);
+    }
+
+    public TableView<OrderItem> getTvSelectedObjects() {
+        return tvSelectedObjects;
     }
 }
