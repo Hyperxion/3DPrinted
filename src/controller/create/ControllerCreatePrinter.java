@@ -78,7 +78,7 @@ public class ControllerCreatePrinter implements Initializable {
             double dutyDouble = PrintedAPI.round(Double.parseDouble(txtFieldDuty.getText()));
             double taxDouble = PrintedAPI.round(Double.parseDouble(txtFieldTax.getText()));
 
-            if (shippingDouble <= 0 || priceDouble <= 0 || dutyDouble <= 0 || taxDouble <= 0) {
+            if (shippingDouble < 0 || priceDouble <= 0 || dutyDouble < 0 || taxDouble < 0) {
                 labelInfo.setText("Numeric values must be greater than zero.");
                 labelInfo.setTextFill(Color.web("#ff0000"));
                 return false;

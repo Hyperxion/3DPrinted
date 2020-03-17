@@ -57,6 +57,9 @@ public class ControllerSetAdditionalData implements Initializable {
                 //there are values entered during editing object's properties. It can be changed multiple time back and forth
                 int quantityNew = Integer.parseInt(newValue);
 
+                labelInfo.setText("Fill the fields");
+                labelInfo.setTextFill(Color.web("#00cd00"));
+
                 //this is object's quantity at the moment of opening window
                 int quantity = selectedItem.getObject().getSoldCount();
 
@@ -118,6 +121,7 @@ public class ControllerSetAdditionalData implements Initializable {
         btnAssign.setOnAction(event -> {
             if (assignValues())PrintedAPI.closeWindow(btnAssign);
             controllerCreateOrder.getTvSelectedObjects().refresh();
+            controllerCreateOrder.calculateStats();
         });
 
         btnCancel.setOnAction(event -> PrintedAPI.closeWindow(btnCancel));

@@ -38,6 +38,7 @@ public class ControllerCreateOrder implements Initializable {
     private ObservableList<Printer> listOfPrinters;
     private ObservableList<OrderItem> orderItems = FXCollections.observableArrayList();
 
+    @FXML
     private ToggleGroup toggleGroupStatus = new ToggleGroup();
 
     @FXML
@@ -59,10 +60,10 @@ public class ControllerCreateOrder implements Initializable {
     private TableColumn<OrderItem, String> colName, colPrinter, colBuildTimeFormatted, colMaterialType, colMaterialColor;
 
     @FXML
-    private Button btnCreate, btnCancel, btnSelectCust, btnAddObj, btnRemoveSelected;
+    private Button btnCreate, btnCancel, btnSelectCust, btnAddObj, btnRemoveSelected, btnCalculatePrices;
 
     @FXML
-    private RadioButton radioButtonSold;
+    private RadioButton radioButtonSold, radioBtnNotSold;
 
     @FXML
     private DatePicker datePickerDateCreated, datePickerDueDate;
@@ -97,9 +98,10 @@ public class ControllerCreateOrder implements Initializable {
 
         btnCreate.setOnAction(event -> {
             if (createOrder()) {
+                System.out.println(newOrder.getStatus());
                 Order.insertUpdateOrder(newOrder, ds);
                 PrintedAPI.closeWindow(btnCreate);
-                PrintedAPI.serviceStart(controllerMain.getServiceDownloadAllTables());
+                //PrintedAPI.serviceStart(controllerMain.getServiceDownloadAllTables());
             }
         });
 
@@ -126,6 +128,8 @@ public class ControllerCreateOrder implements Initializable {
                 e.printStackTrace();
             }
         });
+
+        btnCalculatePrices.setOnAction(event -> setPrices());
 
         tvSelectedObjects.setRowFactory( tv -> {
             TableRow<OrderItem> row = new TableRow<>();
@@ -160,7 +164,8 @@ public class ControllerCreateOrder implements Initializable {
         });
 
         btnRemoveSelected.setOnAction(event -> {
-            System.out.println(tvSelectedObjects.getSelectionModel().getSelectedItem().getPrinter().getName());
+            tvSelectedObjects.getItems().removeAll(tvSelectedObjects.getSelectionModel().getSelectedItems());
+            tvSelectedObjects.refresh();
         });
 
         btnCancel.setOnAction(event -> PrintedAPI.closeWindow(btnCancel));
@@ -187,11 +192,11 @@ public class ControllerCreateOrder implements Initializable {
 
         //Centering content
         PrintedAPI.centerColumns(tvSelectedObjects.getColumns());
-        tvSelectedObjects.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        tvSelectedObjects.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     protected void calculateStats(){
-        double price = 0, weight = 0, supportWeight = 0, costs = 0;
+        double price = 0, weight = 0, supportWeight = 0, costs = 0, pricePerMinute;
         int buildTime = 0, quantity = 0;
 
         ObservableList<OrderItem> orderItems = tvSelectedObjects.getItems();
@@ -205,14 +210,17 @@ public class ControllerCreateOrder implements Initializable {
             quantity += item.getObject().getSoldCount();
         }
 
+        pricePerMinute = price / buildTime;
+
+        txtFieldPricePerHour.setText(pricePerMinute * 60 + "");
         labelWeight.setText(PrintedAPI.round(weight) + " g");
         labelSupportWeight.setText(PrintedAPI.round(supportWeight) + " g");
-        labelWeightSum.setText((weight + supportWeight) + " g");
+        labelWeightSum.setText(PrintedAPI.round((weight + supportWeight)) + " g");
         labelQuantity.setText(quantity + "");
         labelBuildTime.setText(PrintedAPI.formatTime(buildTime).get());
         labelPrice.setText(PrintedAPI.round(price) + " $");
         labelCosts.setText(PrintedAPI.round(costs) + " $");
-        labelProfit.setText((price - costs) + " $");
+        labelProfit.setText(PrintedAPI.round((price - costs)) + " $");
     }
 
     public boolean createOrder(){
@@ -273,6 +281,34 @@ public class ControllerCreateOrder implements Initializable {
             labelInfo.setText("Wrong number format! Please, check your values!");
             labelInfo.setTextFill(Color.web("#ff0000"));
             return false;
+        }
+    }
+
+    private void setPrices(){
+        try {
+            ObservableList<OrderItem> items = tvSelectedObjects.getItems();
+
+            double pricePerHour = Double.parseDouble(txtFieldPricePerHour.getText());
+            double pricePerMinute = pricePerHour/60;
+
+            if (pricePerHour <= 0) {
+                labelInfo.setText("Price per hour must be higher than zero!");
+                labelInfo.setTextFill(Color.web("#ff0000"));
+                return;
+            }
+
+            for (OrderItem item : items) {
+                item.getObject().setSoldPrice(PrintedAPI.round(pricePerMinute * item.getObject().getBuildTime()));
+            }
+
+            calculateStats();
+            tvSelectedObjects.refresh();
+
+        } catch (NumberFormatException e) {
+            //e.printStackTrace();
+            labelInfo.setText("Wrong number format for price per hour! Please, check your values!");
+            labelInfo.setTextFill(Color.web("#ff0000"));
+            return;
         }
     }
 
