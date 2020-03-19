@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -110,6 +111,12 @@ public class ControllerSetAdditionalData implements Initializable {
                 stage.centerOnScreen();
                 stage.show();
 
+                stage.getScene().setOnKeyPressed(event1 -> {
+                    if(event1.getCode() == KeyCode.ENTER){
+                        ctrl.getBtnSelect().fire();
+                    }
+                });
+
                 ctrl.setControllerSetAdditionalData(this);
                 ctrl.setFields(controllerCreateOrder.getListOfNotSpentMaterials());
 
@@ -152,7 +159,7 @@ public class ControllerSetAdditionalData implements Initializable {
             int minutes = Integer.parseInt(txtFieldMinutes.getText());
             int buildTime = hours * 60 + minutes;
 
-            if (costs < 0 || price <= 0 || weight <= 0 || supportWeight < 0 || quantity <= 0 || hours < 0 || buildTime <= 0){
+            if (costs < 0 || price < 0 || weight <= 0 || supportWeight < 0 || quantity <= 0 || hours < 0 || buildTime <= 0){
                 labelInfo.setText("Numeric values must be greater than zero.");
                 labelInfo.setTextFill(Color.web("#ff0000"));
                 return  false;
@@ -193,7 +200,7 @@ public class ControllerSetAdditionalData implements Initializable {
         this.selectedItem = selectedItem;
         this.selectedMaterial = selectedItem.getMaterial();
 
-        int id = selectedItem.getId();
+        int id = selectedItem.getObject().getId();
         String name = selectedItem.getObject().getName();
 
         double price = PrintedAPI.round(selectedItem.getObject().getSoldPrice());
@@ -291,7 +298,7 @@ public class ControllerSetAdditionalData implements Initializable {
     //In case that it is predefined object, we will want to change only quantity and price - all other information are predefined in Objects tab.
     //All in all, we must define 3D printing object in Objects tab with id = 1
     protected void unlockFields(){
-        int id = selectedItem.getId();
+        int id = selectedItem.getObject().getId();
 
         switch (id){
             case 1:
@@ -318,5 +325,9 @@ public class ControllerSetAdditionalData implements Initializable {
         this.selectedMaterial = selectedMaterial;
         this.selectedItem.setMaterial(selectedMaterial);
         txtFieldMaterial.setText(selectedMaterial.getId() + ";" + selectedMaterial.getType() + ";" + selectedMaterial.getColor());
+    }
+
+    public Button getBtnAssign() {
+        return btnAssign;
     }
 }

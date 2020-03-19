@@ -60,7 +60,7 @@ public class Object {
         ObservableList<Object> objectList = FXCollections.observableArrayList();
 
         //Create query
-        String query = "SELECT * FROM Objects ORDER BY ObjectID";
+        String query = "SELECT * FROM Objects ORDER BY ObjectID DESC";
 
         Connection conn = null;
         Statement stmt = null;

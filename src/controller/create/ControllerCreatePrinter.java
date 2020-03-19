@@ -49,7 +49,8 @@ public class ControllerCreatePrinter implements Initializable {
             if (createPrinter()) {
                 Printer.insertUpdatePrinter(newPrinter, ds);
                 PrintedAPI.closeWindow(btnCreate);
-                PrintedAPI.serviceStart(controllerMain.getServiceDownloadAllTables());
+                controllerMain.getListOfPrinters().add(0, newPrinter);
+                controllerMain.getPrintersTv().refresh();
             }
         });
 
@@ -141,6 +142,9 @@ public class ControllerCreatePrinter implements Initializable {
             }
         });
         comboBoxType.setValue(printerTypes.get(0));
+    }
 
+    public Button getBtnCreate() {
+        return btnCreate;
     }
 }

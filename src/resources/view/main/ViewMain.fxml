@@ -220,7 +220,7 @@
                                             </font>
                                         </Label>
                                         <Label text="Items Printed" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="41" />
-                                        <Label fx:id="ordersLabelSelectedBuildTime" text="Build TIme" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="38" />
+                                        <Label text="Build TIme" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="38" />
                                         <Label text="Weight/Support Weight" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="35" />
                                         <Label text="Price per Hour" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="32" />
                                         <Label text="Price/Costs (Profit)" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="29" />
@@ -229,7 +229,7 @@
                                                 <Font name="System Bold" size="14.0" />
                                             </font>
                                         </Label>
-                                        <Label text="999h 59m" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="39">
+                                        <Label fx:id="ordersLabelSelectedBuildTime" text="999h 59m" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="39">
                                             <font>
                                                 <Font name="System Bold" size="14.0" />
                                             </font>

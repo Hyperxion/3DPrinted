@@ -26,7 +26,7 @@ public class Printer {
         ObservableList<Printer> printers = FXCollections.observableArrayList();
 
         //Create query
-        String query = "SELECT * FROM Printers ORDER BY PrinterID";
+        String query = "SELECT * FROM Printers ORDER BY PrinterID DESC";
 
         Connection conn = null;
         Statement stmt = null;

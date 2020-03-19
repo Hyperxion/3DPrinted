@@ -38,7 +38,8 @@ public class ControllerCreateObject implements Initializable {
             if (createObject()){
                 Object.insertUpdateObject(newObject, ds);
                 PrintedAPI.closeWindow(btnCreate);
-                PrintedAPI.serviceStart(controllerMain.getServiceDownloadAllTables());
+                controllerMain.getListOfObjects().add(0, newObject);
+                controllerMain.getObjTv().refresh();
             }
         });
 
@@ -115,4 +116,7 @@ public class ControllerCreateObject implements Initializable {
         labelTitle.setText("New Object");
     }
 
+    public Button getBtnCreate() {
+        return btnCreate;
+    }
 }

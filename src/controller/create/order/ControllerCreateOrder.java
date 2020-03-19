@@ -16,6 +16,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -87,6 +88,12 @@ public class ControllerCreateOrder implements Initializable {
                 stage.setResizable(false);
                 stage.centerOnScreen();
 
+                stage.getScene().setOnKeyPressed(event1 -> {
+                    if(event1.getCode() == KeyCode.ENTER){
+                        ctrl.getBtnSelect().fire();
+                    }
+                });
+
                 ctrl.setControllerCreateOrder(this);
                 ctrl.loadCustomers();
 
@@ -98,10 +105,11 @@ public class ControllerCreateOrder implements Initializable {
 
         btnCreate.setOnAction(event -> {
             if (createOrder()) {
-                System.out.println(newOrder.getStatus());
                 Order.insertUpdateOrder(newOrder, ds);
+                OrderItem.insertUpdateOrderItem(newOrder.getOrderItems(), ds, PrintedAPI.getCurrentAutoIncrementValue(ds, "OrderItems"));
                 PrintedAPI.closeWindow(btnCreate);
-                //PrintedAPI.serviceStart(controllerMain.getServiceDownloadAllTables());
+                controllerMain.getListOfOrders().add(0, newOrder);
+                controllerMain.getOrdersTv().refresh();
             }
         });
 
@@ -119,6 +127,12 @@ public class ControllerCreateOrder implements Initializable {
                 stage.setScene(new Scene(root1));
                 stage.setResizable(false);
                 stage.centerOnScreen();
+
+                stage.getScene().setOnKeyPressed(event1 -> {
+                    if(event1.getCode() == KeyCode.ENTER){
+                        ctrl.getBtnSelect().fire();
+                    }
+                });
 
                 ctrl.setControllerCreateOrder(this);
                 ctrl.loadObjects();
@@ -149,6 +163,12 @@ public class ControllerCreateOrder implements Initializable {
                         stage.setResizable(false);
                         stage.centerOnScreen();
                         stage.show();
+
+                        stage.getScene().setOnKeyPressed(event1 -> {
+                            if(event1.getCode() == KeyCode.ENTER){
+                                ctrl.getBtnAssign().fire();
+                            }
+                        });
 
                         ctrl.setControllerCreateOrder(this);
                         ctrl.setFieldsValues(tvSelectedObjects.getSelectionModel().getSelectedItem());
@@ -188,7 +208,7 @@ public class ControllerCreateOrder implements Initializable {
         colPrice.setCellValueFactory((param) -> param.getValue().getObject().soldPriceProperty().asObject());
         colCosts.setCellValueFactory((param) -> param.getValue().getObject().costsProperty().asObject());
 
-        colId.setCellValueFactory((param) -> param.getValue().idProperty().asObject());
+        colId.setCellValueFactory((param) -> param.getValue().getObject().idProperty().asObject());
 
         //Centering content
         PrintedAPI.centerColumns(tvSelectedObjects.getColumns());
@@ -212,7 +232,7 @@ public class ControllerCreateOrder implements Initializable {
 
         pricePerMinute = price / buildTime;
 
-        txtFieldPricePerHour.setText(pricePerMinute * 60 + "");
+        txtFieldPricePerHour.setText(PrintedAPI.round(pricePerMinute * 60) + "");
         labelWeight.setText(PrintedAPI.round(weight) + " g");
         labelSupportWeight.setText(PrintedAPI.round(supportWeight) + " g");
         labelWeightSum.setText(PrintedAPI.round((weight + supportWeight)) + " g");
@@ -370,7 +390,7 @@ public class ControllerCreateOrder implements Initializable {
             obj.setSoldPrice(0);
             obj.setCosts(0);
 
-            id = obj.idProperty();
+            id = new SimpleIntegerProperty(0);
             orderId = new SimpleIntegerProperty(Integer.parseInt(labelId.getText()));
 
             material = listOfNotSpentMaterials.get(0);
@@ -385,5 +405,9 @@ public class ControllerCreateOrder implements Initializable {
 
     public TableView<OrderItem> getTvSelectedObjects() {
         return tvSelectedObjects;
+    }
+
+    public Button getBtnCreate() {
+        return btnCreate;
     }
 }

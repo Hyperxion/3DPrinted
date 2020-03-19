@@ -25,7 +25,7 @@ public class Cost {
         ObservableList<Cost> costs = FXCollections.observableArrayList();
 
         //Create query
-        String query = "SELECT * FROM Costs";
+        String query = "SELECT * FROM Costs ORDER BY CostID DESC";
 
         Connection conn = null;
         Statement stmt = null;

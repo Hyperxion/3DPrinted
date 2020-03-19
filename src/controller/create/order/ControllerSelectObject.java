@@ -49,7 +49,7 @@ public class ControllerSelectObject implements Initializable {
 
         btnClose.setOnAction(event -> PrintedAPI.closeWindow(btnClose));
 
-        txtFieldSearch.textProperty().addListener((observable, oldValue, newValue) -> searchCustomers(newValue));
+        txtFieldSearch.textProperty().addListener((observable, oldValue, newValue) -> searchObjects(newValue));
 
         tvObjects.setRowFactory(tv -> {
             TableRow<Object> row = new TableRow<>();
@@ -67,16 +67,16 @@ public class ControllerSelectObject implements Initializable {
         tvObjects.setItems(listOfObjects);
     }
 
-    private void searchCustomers(String lastName) {
+    private void searchObjects(String objName) {
         ObservableList<Object> filteredObjects = FXCollections.observableArrayList();
 
-        if (lastName.isEmpty()){
+        if (objName.isEmpty()){
             tvObjects.setItems(listOfObjects);
             return;
         } else {
             for (Object obj : listOfObjects){
                 String string = obj.getName();
-                if (string.contains(lastName)) {
+                if (string.contains(objName)) {
                     filteredObjects.add(obj);
                 }
             }
@@ -104,5 +104,9 @@ public class ControllerSelectObject implements Initializable {
 
     public void setControllerCreateOrder(ControllerCreateOrder controllerCreateOrder) {
         this.controllerCreateOrder = controllerCreateOrder;
+    }
+
+    public Button getBtnSelect() {
+        return btnSelect;
     }
 }

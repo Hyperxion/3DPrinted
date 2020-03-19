@@ -49,7 +49,8 @@ public class ControllerCreateCustomer implements Initializable {
             if (createCustomer()){
                 Customer.insertUpdateCust(newCust, ds);
                 PrintedAPI.closeWindow(btnCreate);
-                PrintedAPI.serviceStart(controllerMain.getServiceDownloadAllTables());
+                controllerMain.getListOfCustomers().add(0, newCust);
+                controllerMain.getCustTv().refresh();
             }
         });
 
@@ -147,5 +148,9 @@ public class ControllerCreateCustomer implements Initializable {
 
     public void setControllerMain(ControllerMain controllerMain) {
         this.controllerMain = controllerMain;
+    }
+
+    public Button getBtnCreate() {
+        return btnCreate;
     }
 }

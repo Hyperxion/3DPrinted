@@ -27,7 +27,7 @@ public class Material {
         ObservableList<Material> materials = FXCollections.observableArrayList();
 
         //Create query
-        String query = "SELECT * FROM Materials ORDER BY MaterialID ASC";
+        String query = "SELECT * FROM Materials ORDER BY MaterialID DESC";
 
         Connection conn = null;
         Statement stmt = null;

@@ -82,4 +82,9 @@ public class ControllerSelectMaterial implements Initializable {
     public void setControllerSetAdditionalData(ControllerSetAdditionalData controllerSetAdditionalData) {
         this.controllerSetAdditionalData = controllerSetAdditionalData;
     }
+
+    public Button getBtnSelect() {
+        return btnSelect;
+    }
 }
+

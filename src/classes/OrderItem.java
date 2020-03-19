@@ -37,6 +37,14 @@ public class OrderItem {
     //SimpleIntegerProperty printerId
     private Printer printer;
 
+    public OrderItem(SimpleIntegerProperty id, SimpleIntegerProperty orderId, Object obj, Material mat, Printer printer) {
+        this.id = id;
+        this.orderId = orderId;
+        this.object = obj;
+        this.material = mat;
+        this.printer = printer;
+    }
+
     public static ObservableList<OrderItem> downloadOrderItemsTable(HikariDataSource ds){
 
         //Create list
@@ -121,12 +129,92 @@ public class OrderItem {
         return orderItems;
     }
 
-    public OrderItem(SimpleIntegerProperty id, SimpleIntegerProperty orderId, Object obj, Material mat, Printer printer) {
-        this.id = id;
-        this.orderId = orderId;
-        this.object = obj;
-        this.material = mat;
-        this.printer = printer;
+    public static void insertUpdateOrderItem(ObservableList<OrderItem> orderItems, HikariDataSource ds, int autoincrementValue){
+
+        //Create query
+        String updateQuery;
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            //STEP 2: Register JDBC driver
+            Class.forName("org.mariadb.jdbc.Driver");
+
+            //STEP 3: Open a connection
+
+            conn = ds.getConnection();
+            //STEP 4: Execute a query
+
+            for (OrderItem orderItem : orderItems) {
+                updateQuery = "INSERT INTO OrderItems (OrderItemID, OrderID, ObjectID, ItemMaterialID, ItemWeight, ItemSupportWeight, ItemBuildTime, ItemPrice, ItemQuantity, PrinterID, ItemCosts) VALUES (?,?,?,?,?,?,?,?,?,?,?) "
+                        + "ON DUPLICATE KEY UPDATE OrderItemID=?, OrderID=?, ObjectID=?, ItemMaterialID=?, ItemWeight=?, ItemSupportWeight=?, ItemBuildTime=?, ItemPrice=?, ItemQuantity=?, PrinterID=?, ItemCosts=?";
+
+                stmt = conn.prepareStatement(updateQuery);
+
+                int i = 0;
+
+                if (orderItem.getId() != 0){
+                    stmt.setInt(++i, orderItem.getId());
+                } else {
+                    stmt.setInt(++i, autoincrementValue++);
+                }
+
+                stmt.setInt(++i, orderItem.getOrderId());//orderitem id
+                stmt.setInt(++i, orderItem.getObject().getId());//order id
+                stmt.setInt(++i, orderItem.getMaterial().getId());
+                stmt.setDouble(++i, orderItem.getObject().getWeight());
+                stmt.setDouble(++i, orderItem.getObject().getSupportWeight());
+                stmt.setInt(++i, orderItem.getObject().getBuildTime());
+                stmt.setDouble(++i,orderItem.getObject().getSoldPrice());
+                stmt.setInt(++i,orderItem.getObject().getSoldCount());
+                stmt.setInt(++i,orderItem.getPrinter().getId());
+                stmt.setDouble(++i, orderItem.getObject().getCosts());
+
+                if (orderItem.getId() != 0){
+                    stmt.setInt(++i, orderItem.getId());
+                } else {
+                    stmt.setInt(++i, autoincrementValue);
+                }
+                stmt.setInt(++i, orderItem.getOrderId());//orderitem id
+                stmt.setInt(++i, orderItem.getObject().getId());
+                stmt.setInt(++i, orderItem.getMaterial().getId());
+                stmt.setDouble(++i, orderItem.getObject().getWeight());
+                stmt.setDouble(++i, orderItem.getObject().getSupportWeight());
+                stmt.setInt(++i, orderItem.getObject().getBuildTime());
+                stmt.setDouble(++i,orderItem.getObject().getSoldPrice());
+                stmt.setInt(++i,orderItem.getObject().getSoldCount());
+                stmt.setInt(++i,orderItem.getPrinter().getId());
+                stmt.setDouble(++i, orderItem.getObject().getCosts());
+
+                stmt.executeUpdate();
+            }
+
+            stmt.close();
+            conn.close();
+        } catch (SQLNonTransientConnectionException se) {
+            se.printStackTrace();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null)
+                    conn.close();
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
     }
 
     public int getId() {

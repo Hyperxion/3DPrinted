@@ -30,7 +30,7 @@ public class Customer {
         ObservableList<Customer> customersList = FXCollections.observableArrayList();
 
         //Create query
-        String query = "SELECT * FROM Customers ORDER BY CustomerID";
+        String query = "SELECT * FROM Customers ORDER BY CustomerID DESC";
 
         Connection conn = null;
         Statement stmt = null;

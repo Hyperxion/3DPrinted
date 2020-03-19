@@ -49,7 +49,8 @@ public class ControllerCreateMaterial implements Initializable {
             if (createMaterial()) {
                 Material.insertUpdateMaterial(newMaterial, ds);
                 PrintedAPI.closeWindow(btnCreate);
-                PrintedAPI.serviceStart(controllerMain.getServiceDownloadAllTables());
+                controllerMain.getListOfMaterials().add(0, newMaterial);
+                controllerMain.getMatTv().refresh();
             }
         });
 
@@ -221,5 +222,9 @@ public class ControllerCreateMaterial implements Initializable {
         });
         comboBoxWeight.setValue(weights.get(0));
 
+    }
+
+    public Button getBtnCreate() {
+        return btnCreate;
     }
 }

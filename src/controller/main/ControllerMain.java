@@ -17,9 +17,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.omg.CORBA.MARSHAL;
 
 import java.io.IOException;
 import java.net.URL;
@@ -1216,15 +1216,21 @@ public class ControllerMain implements Initializable {
             Parent root1 = fxmlLoader.load();
             ControllerCreateCost ctrl = fxmlLoader.getController();
             Stage stage = new Stage();
+
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("New Cost");
+            stage.setScene(new Scene(root1));
             stage.setMinHeight(440);
             stage.setMinWidth(400);
 
-            stage.setScene(new Scene(root1));
+            stage.getScene().setOnKeyPressed(event1 -> {
+                if(event1.getCode() == KeyCode.ENTER){
+                    ctrl.getBtnCreate().fire();
+                }
+            });
+
             stage.setResizable(false);
             stage.centerOnScreen();
-
 
             //passing credentials to main controller
             ctrl.setDs(ds);
@@ -1250,13 +1256,16 @@ public class ControllerMain implements Initializable {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("New Printer");
-            //stage.setMinHeight(440);
-            //stage.setMinWidth(506);
 
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
             stage.centerOnScreen();
 
+            stage.getScene().setOnKeyPressed(event1 -> {
+                if(event1.getCode() == KeyCode.ENTER){
+                    ctrl.getBtnCreate().fire();
+                }
+            });
 
             //passing credentials to main controller
             ctrl.setDs(ds);
@@ -1290,6 +1299,11 @@ public class ControllerMain implements Initializable {
                 stage.setResizable(false);
                 stage.centerOnScreen();
 
+                stage.getScene().setOnKeyPressed(event1 -> {
+                    if(event1.getCode() == KeyCode.ENTER){
+                        ctrl.getBtnCreate().fire();
+                    }
+                });
 
                 //passing credentials to main controller
                 ctrl.setDs(ds);
@@ -1322,6 +1336,11 @@ public class ControllerMain implements Initializable {
             stage.setResizable(false);
             stage.centerOnScreen();
 
+            stage.getScene().setOnKeyPressed(event1 -> {
+                if(event1.getCode() == KeyCode.ENTER){
+                    ctrl.getBtnCreate().fire();
+                }
+            });
 
             //passing credentials to main controller
             ctrl.setDs(ds);
@@ -1353,6 +1372,11 @@ public class ControllerMain implements Initializable {
             stage.setResizable(false);
             stage.centerOnScreen();
 
+            stage.getScene().setOnKeyPressed(event1 -> {
+                if(event1.getCode() == KeyCode.ENTER){
+                    ctrl.getBtnCreate().fire();
+                }
+            });
 
             //passing credentials to main controller
             ctrl.setDs(ds);
@@ -1378,13 +1402,17 @@ public class ControllerMain implements Initializable {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("New Object");
-            //stage.setMinHeight(440);
-            //stage.setMinWidth(506);
 
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
             stage.centerOnScreen();
             stage.show();
+
+            stage.getScene().setOnKeyPressed(event1 -> {
+                if(event1.getCode() == KeyCode.ENTER){
+                    ctrl.getBtnCreate().fire();
+                }
+            });
 
             //passing credentials to main controller
             ctrl.setDs(ds);
@@ -1398,6 +1426,9 @@ public class ControllerMain implements Initializable {
     });
 
     }//end of initialize();
+
+    /*************************          GETTERS & SETTERS          *************************/
+
 
     public Label getLabelMainInfo() {
         return labelMainInfo;
@@ -1423,7 +1454,17 @@ public class ControllerMain implements Initializable {
         return commonOrderStatus;
     }
 
-    /*************************          GETTERS & SETTERS          *************************/
+    public ObservableList<Cost> getListOfCosts() {
+        return listOfCosts;
+    }
+
+    public ObservableList<Material> getListOfMaterials() {
+        return listOfMaterials;
+    }
+
+    public ObservableList<Order> getListOfOrders() {
+        return listOfOrders;
+    }
 
     public ObservableList<Customer> getListOfCustomers() {
         return listOfCustomers;

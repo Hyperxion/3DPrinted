@@ -49,7 +49,11 @@ public class ControllerCreateCost implements Initializable {
             if (createCost()) {
                 Cost.insertUpdateCost(newCost, ds);
                 PrintedAPI.closeWindow(btnCreate);
-                PrintedAPI.serviceStart(controllerMain.getServiceDownloadAllTables());
+                //instead of loading all tables again, which consumes resources, we can just add new cost into existing list
+                //and insert new cost into database.
+                //PrintedAPI.serviceStart(controllerMain.getServiceDownloadAllTables());
+                controllerMain.getListOfCosts().add(0, newCost);
+                controllerMain.getCostsTv().refresh();
             }
         });
 
@@ -141,4 +145,7 @@ public class ControllerCreateCost implements Initializable {
         datePickerPurchaseDate.setValue(LocalDate.now());
     }
 
+    public Button getBtnCreate() {
+        return btnCreate;
+    }
 }

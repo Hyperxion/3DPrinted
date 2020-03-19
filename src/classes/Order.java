@@ -1,11 +1,9 @@
 package classes;
 
 import com.zaxxer.hikari.HikariDataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLNonTransientConnectionException;
-import java.sql.Statement;
+
+import java.sql.*;
+
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -60,10 +58,10 @@ public class Order {
         this.price = price;
         this.weight = weight;
         this.supportWeight = supportWeight;
-        this.customerName = null;
+        this.customerName = new SimpleStringProperty(customer.getLastName() + " " + customer.getFirstName() + "");
         this.buildTimeFormatted = PrintedAPI.formatTime(buildTime.get());
         this.orderItems = orderItems;
-        this.customer = null;
+        this.customer = customer;
     }
 
     public static ObservableList<Order> downloadOrdersTable(HikariDataSource ds) {
@@ -150,8 +148,83 @@ public class Order {
         return orders;
     }
 
-    public static void insertUpdateOrder(Order newOrder, HikariDataSource ds){
+    public static void insertUpdateOrder(Order order, HikariDataSource ds){
 
+        //Create query
+        String updateOrderQuery;
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            //STEP 2: Register JDBC driver
+            Class.forName("org.mariadb.jdbc.Driver");
+
+            //STEP 3: Open a connection
+
+            conn = ds.getConnection();
+            //STEP 4: Execute a query
+
+            updateOrderQuery = "INSERT INTO Orders (OrderID, CustomerID, OrderPrice, OrderQuantity, DateCreated, OrderStatus, DueDate, Comment, OrderCosts, OrderWeight, OrderSupportWeight, OrderBuildTime) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) "
+                    + "ON DUPLICATE KEY UPDATE OrderID=?, CustomerID=?, OrderPrice=?, OrderQuantity=?, DateCreated=?, OrderStatus=?, DueDate=?, Comment=?, OrderCosts=?, OrderWeight=?, OrderSupportWeight=?, OrderBuildTime=?";
+
+            stmt = conn.prepareStatement(updateOrderQuery);
+
+            int i = 0;
+
+            stmt.setInt(++i, order.getId());
+            stmt.setInt(++i, order.getCustomerId());
+            stmt.setDouble(++i, order.getPrice());
+            stmt.setInt(++i, order.getQuantity());
+            stmt.setString(++i, order.getDateCreated());
+            stmt.setString(++i, order.getStatus());
+            stmt.setString(++i, order.getDueDate());
+            stmt.setString(++i,order.getComment());
+            stmt.setDouble(++i,order.getCosts());
+            stmt.setDouble(++i,order.getWeight());
+            stmt.setDouble(++i,order.getSupportWeight());
+            stmt.setInt(++i, order.getBuildTime());
+
+            stmt.setInt(++i, order.getId());
+            stmt.setInt(++i, order.getCustomerId());
+            stmt.setDouble(++i, order.getPrice());
+            stmt.setInt(++i, order.getQuantity());
+            stmt.setString(++i, order.getDateCreated());
+            stmt.setString(++i, order.getStatus());
+            stmt.setString(++i, order.getDueDate());
+            stmt.setString(++i,order.getComment());
+            stmt.setDouble(++i,order.getCosts());
+            stmt.setDouble(++i,order.getWeight());
+            stmt.setDouble(++i,order.getSupportWeight());
+            stmt.setInt(++i, order.getBuildTime());
+
+            stmt.executeUpdate();
+
+            stmt.close();
+            conn.close();
+        } catch (SQLNonTransientConnectionException se) {
+            se.printStackTrace();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null)
+                    conn.close();
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
     }
 
     public int getId() {

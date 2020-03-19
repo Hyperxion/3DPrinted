@@ -37,6 +37,52 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
+                <ComboBox fx:id="comboBoxType" prefHeight="25.0" prefWidth="296.0" promptText="Choose type..." GridPane.columnIndex="1" GridPane.rowIndex="3">
+                    <GridPane.margin>
+                        <Insets left="5.0" />
+                    </GridPane.margin></ComboBox>
+                <ComboBox fx:id="comboBoxColor" prefHeight="25.0" prefWidth="150.0" promptText="Choose color..." GridPane.columnIndex="1" GridPane.rowIndex="4">
+                    <GridPane.margin>
+                        <Insets left="5.0" />
+                    </GridPane.margin></ComboBox>
+                <ComboBox fx:id="comboBoxDiameter" prefHeight="25.0" prefWidth="150.0" promptText="Choose diameter..." GridPane.columnIndex="1" GridPane.rowIndex="5">
+                    <GridPane.margin>
+                        <Insets left="5.0" />
+                    </GridPane.margin>
+                </ComboBox>
+                <ComboBox fx:id="comboBoxWeight" prefHeight="25.0" prefWidth="150.0" promptText="Choose weight..." GridPane.columnIndex="1" GridPane.rowIndex="6">
+                    <GridPane.margin>
+                        <Insets left="5.0" />
+                    </GridPane.margin></ComboBox>
+                <ComboBox fx:id="comboBoxManufacturer" prefHeight="25.0" prefWidth="150.0" promptText="Choose manufacturer..." GridPane.columnIndex="1" GridPane.rowIndex="7">
+                    <GridPane.margin>
+                        <Insets left="5.0" />
+                    </GridPane.margin></ComboBox>
+                <ComboBox fx:id="comboBoxDistributor" prefHeight="25.0" prefWidth="150.0" promptText="Choose distributor..." GridPane.columnIndex="1" GridPane.rowIndex="8">
+                    <GridPane.margin>
+                        <Insets left="5.0" />
+                    </GridPane.margin>
+                </ComboBox>
+                <TextField fx:id="txtFieldPrice" prefHeight="25.0" text="0" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                    <GridPane.margin>
+                        <Insets left="5.0" right="250.0" />
+                    </GridPane.margin>
+                </TextField>
+                <TextField fx:id="txtFieldShipping" prefHeight="25.0" text="0" GridPane.columnIndex="1" GridPane.rowIndex="10">
+                    <GridPane.margin>
+                        <Insets left="5.0" right="250.0" />
+                    </GridPane.margin>
+                </TextField>
+                <DatePicker fx:id="datePickerPurchaseDate" editable="false" prefHeight="25.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
+                    <GridPane.margin>
+                        <Insets left="5.0" right="200.0" />
+                    </GridPane.margin>
+                </DatePicker>
+                <TextField fx:id="txtFieldComment" prefHeight="25.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                    <GridPane.margin>
+                        <Insets left="5.0" right="20.0" />
+                    </GridPane.margin>
+                </TextField>
                 <Label fx:id="labelTitle" text="New Material" GridPane.columnSpan="2" GridPane.halignment="CENTER">
                     <font>
                         <Font name="System Bold" size="22.0" />
@@ -108,21 +154,6 @@
                         <Font size="14.0" />
                     </font>
                 </Button>
-                <TextField fx:id="txtFieldPrice" prefHeight="25.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
-                    <GridPane.margin>
-                        <Insets left="5.0" right="250.0" />
-                    </GridPane.margin>
-                </TextField>
-                <TextField fx:id="txtFieldShipping" prefHeight="25.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
-                    <GridPane.margin>
-                        <Insets left="5.0" right="250.0" />
-                    </GridPane.margin>
-                </TextField>
-                <TextField fx:id="txtFieldComment" prefHeight="25.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
-                    <GridPane.margin>
-                        <Insets left="5.0" right="20.0" />
-                    </GridPane.margin>
-                </TextField>
                 <Label fx:id="labelId" text="12" GridPane.columnIndex="1" GridPane.rowIndex="2">
                     <font>
                         <Font name="System Bold" size="18.0" />
@@ -141,24 +172,11 @@
                         <Insets left="65.0" />
                     </GridPane.margin>
                 </Label>
-                <DatePicker fx:id="datePickerPurchaseDate" editable="false" prefHeight="25.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
-                    <GridPane.margin>
-                        <Insets left="5.0" right="200.0" />
-                    </GridPane.margin>
-                </DatePicker>
                 <Label fx:id="labelInfo" text="Fill the fields." textFill="#00cd00" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                     <font>
                         <Font size="14.0" />
                     </font>
                 </Label>
-                <ComboBox fx:id="comboBoxType" prefHeight="25.0" prefWidth="296.0" promptText="Choose type..." GridPane.columnIndex="1" GridPane.rowIndex="3">
-                    <GridPane.margin>
-                        <Insets left="5.0" />
-                    </GridPane.margin></ComboBox>
-                <ComboBox fx:id="comboBoxColor" prefHeight="25.0" prefWidth="150.0" promptText="Choose color..." GridPane.columnIndex="1" GridPane.rowIndex="4">
-                    <GridPane.margin>
-                        <Insets left="5.0" />
-                    </GridPane.margin></ComboBox>
                 <Label text="Manufacturer:" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
                     <font>
                         <Font size="14.0" />
@@ -167,10 +185,6 @@
                         <Insets right="5.0" />
                     </GridPane.margin>
                 </Label>
-                <ComboBox fx:id="comboBoxManufacturer" prefHeight="25.0" prefWidth="150.0" promptText="Choose manufacturer..." GridPane.columnIndex="1" GridPane.rowIndex="7">
-                    <GridPane.margin>
-                        <Insets left="5.0" />
-                    </GridPane.margin></ComboBox>
                 <Label text="Weight:" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
                     <font>
                         <Font size="14.0" />
@@ -179,10 +193,6 @@
                         <Insets right="5.0" />
                     </GridPane.margin>
                 </Label>
-                <ComboBox fx:id="comboBoxWeight" prefHeight="25.0" prefWidth="150.0" promptText="Choose weight..." GridPane.columnIndex="1" GridPane.rowIndex="6">
-                    <GridPane.margin>
-                        <Insets left="5.0" />
-                    </GridPane.margin></ComboBox>
                 <Label text="Diameter:" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
                     <font>
                         <Font size="14.0" />
@@ -191,11 +201,6 @@
                         <Insets right="5.0" />
                     </GridPane.margin>
                 </Label>
-                <ComboBox fx:id="comboBoxDiameter" prefHeight="25.0" prefWidth="150.0" promptText="Choose diameter..." GridPane.columnIndex="1" GridPane.rowIndex="5">
-                    <GridPane.margin>
-                        <Insets left="5.0" />
-                    </GridPane.margin>
-                </ComboBox>
                 <Label text="Distributor:" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
                     <font>
                         <Font size="14.0" />
@@ -204,11 +209,6 @@
                         <Insets right="5.0" />
                     </GridPane.margin>
                 </Label>
-                <ComboBox fx:id="comboBoxDistributor" prefHeight="25.0" prefWidth="150.0" promptText="Choose distributor..." GridPane.columnIndex="1" GridPane.rowIndex="8">
-                    <GridPane.margin>
-                        <Insets left="5.0" />
-                    </GridPane.margin>
-                </ComboBox>
             </children>
             <opaqueInsets>
                 <Insets />

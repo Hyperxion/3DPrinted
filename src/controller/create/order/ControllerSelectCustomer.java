@@ -96,4 +96,8 @@ public class ControllerSelectCustomer implements Initializable {
     public void setControllerCreateOrder(ControllerCreateOrder controllerCreateOrder) {
         this.controllerCreateOrder = controllerCreateOrder;
     }
+
+    public Button getBtnSelect() {
+        return btnSelect;
+    }
 }
