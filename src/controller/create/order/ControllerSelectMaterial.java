@@ -54,7 +54,7 @@ public class ControllerSelectMaterial implements Initializable {
         btnCancel.setOnAction(event -> PrintedAPI.closeWindow(btnCancel));
     }
 
-    protected void setFields(ObservableList<Material> listOfNotSpentMaterials){
+    public void setFields(ObservableList<Material> listOfNotSpentMaterials){
         tvMaterials.setItems(listOfNotSpentMaterials);
     }
 

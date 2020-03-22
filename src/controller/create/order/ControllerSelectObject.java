@@ -3,6 +3,9 @@ package controller.create.order;
 import classes.Material;
 import classes.Object;
 import classes.PrintedAPI;
+import controller.create.ControllerCreateOrder;
+import controller.edit.ControllerEditOrder;
+import controller.main.ControllerMain;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,9 +17,13 @@ import java.util.ResourceBundle;
 
 public class ControllerSelectObject implements Initializable {
 
+    private ControllerMain controllerMain;
     private ControllerCreateOrder controllerCreateOrder;
+    private ControllerEditOrder controllerEditOrder;
+
     private ObservableList<Object> listOfObjects;
-    private ObservableList<Material> notSpentMaterials;
+
+    private boolean isCreated = true;
 
     @FXML
     private TableView<Object> tvObjects;
@@ -36,13 +43,19 @@ public class ControllerSelectObject implements Initializable {
     @FXML
     private TableColumn<Object, Double> colWeight, colSupportWeight;
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeCols();
 
         btnSelect.setOnAction(event -> {
-            controllerCreateOrder.setObjects(tvObjects.getSelectionModel().getSelectedItems());
-            controllerCreateOrder.calculateStats();
+            if (isCreated) {
+                controllerCreateOrder.setObjects(tvObjects.getSelectionModel().getSelectedItems());
+                controllerCreateOrder.calculateStats();
+            } else {
+                controllerEditOrder.setObjects(tvObjects.getSelectionModel().getSelectedItems());
+                controllerEditOrder.calculateStats();
+            }
             PrintedAPI.closeWindow(btnSelect);
 
         });
@@ -63,7 +76,7 @@ public class ControllerSelectObject implements Initializable {
     }
 
     public void loadObjects() {
-        listOfObjects = controllerCreateOrder.getListOfObjects();
+        listOfObjects = controllerMain.getListOfObjects();
         tvObjects.setItems(listOfObjects);
     }
 
@@ -72,7 +85,6 @@ public class ControllerSelectObject implements Initializable {
 
         if (objName.isEmpty()){
             tvObjects.setItems(listOfObjects);
-            return;
         } else {
             for (Object obj : listOfObjects){
                 String string = obj.getName();
@@ -108,5 +120,17 @@ public class ControllerSelectObject implements Initializable {
 
     public Button getBtnSelect() {
         return btnSelect;
+    }
+
+    public void setControllerEditOrder(ControllerEditOrder controllerEditOrder) {
+        this.controllerEditOrder = controllerEditOrder;
+    }
+
+    public void setControllerMain(ControllerMain controllerMain) {
+        this.controllerMain = controllerMain;
+    }
+
+    public void setCreated(boolean created) {
+        isCreated = created;
     }
 }

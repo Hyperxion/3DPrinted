@@ -58,7 +58,7 @@ public class Cost {
                 SimpleStringProperty purchaseDate = new SimpleStringProperty(rs.getString("PurchaseDate"));
                 SimpleStringProperty comment = new SimpleStringProperty(rs.getString("Comment"));
 
-                Cost cost = new Cost(id, quantity, printerId, name, purchaseDate, comment, shipping, price);
+                Cost cost = new Cost(id, quantity, printerId, name, purchaseDate, comment, shipping, price, null);
 
                 costs.add(cost);
 
@@ -86,7 +86,7 @@ public class Cost {
         return costs;
     }
 
-    public Cost(SimpleIntegerProperty id, SimpleIntegerProperty quantity, SimpleIntegerProperty printerId, SimpleStringProperty name, SimpleStringProperty purchaseDate, SimpleStringProperty comment, SimpleDoubleProperty shipping, SimpleDoubleProperty price) {
+    public Cost(SimpleIntegerProperty id, SimpleIntegerProperty quantity, SimpleIntegerProperty printerId, SimpleStringProperty name, SimpleStringProperty purchaseDate, SimpleStringProperty comment, SimpleDoubleProperty shipping, SimpleDoubleProperty price, SimpleStringProperty printerName) {
         this.id = id;
         this.quantity = quantity;
         this.printerId = printerId;
@@ -95,7 +95,12 @@ public class Cost {
         this.comment = comment;
         this.shipping = shipping;
         this.price = price;
-        this.printerName = new SimpleStringProperty();
+        if (printerName == null) {
+            this.printerName = new SimpleStringProperty();
+        } else {
+            this.printerName = printerName;
+        }
+
     }
 
     public static void insertUpdateCost(Cost cost, HikariDataSource ds) {
@@ -116,8 +121,8 @@ public class Cost {
             //STEP 4: Execute a query
 
 
-            updateQuery = "INSERT INTO Costs (CostID,CostName,CostQuantity,CostShipping,Comment,CostPrice,PrinterID) VALUES (?,?,?,?,?,?,?) "
-                    + "ON DUPLICATE KEY UPDATE CostID=?,CostName=?,CostQuantity=?,CostShipping=?,Comment=?,CostPrice=?,PrinterID=?";
+            updateQuery = "INSERT INTO Costs (CostID,CostName,CostQuantity,CostShipping, PurchaseDate, Comment,CostPrice,PrinterID) VALUES (?,?,?,?,?,?,?,?) "
+                    + "ON DUPLICATE KEY UPDATE CostID=?,CostName=?,CostQuantity=?,CostShipping=?, PurchaseDate=?, Comment=?,CostPrice=?,PrinterID=?";
             stmt = conn.prepareStatement(updateQuery);
 
             int i = 0;
@@ -126,6 +131,7 @@ public class Cost {
             stmt.setString(++i, cost.getName());//Cost name
             stmt.setInt(++i, cost.getQuantity());//quantity
             stmt.setDouble(++i,cost.getShipping());//shipping
+            stmt.setString(++i, cost.getPurchaseDate());//purchaseDate
             stmt.setString(++i, cost.getComment());//comment
             stmt.setDouble(++i, cost.getPrice());//price
             stmt.setInt(++i, cost.getPrinterId());//printerId
@@ -134,6 +140,7 @@ public class Cost {
             stmt.setString(++i, cost.getName());//Cost name
             stmt.setInt(++i, cost.getQuantity());//quantity
             stmt.setDouble(++i,cost.getShipping());//shipping
+            stmt.setString(++i, cost.getPurchaseDate());//purchaseDate
             stmt.setString(++i, cost.getComment());//comment
             stmt.setDouble(++i, cost.getPrice());//price
             stmt.setInt(++i, cost.getPrinterId());//printerId

@@ -1063,7 +1063,7 @@
                                 <Button fx:id="costsBtnCreate" mnemonicParsing="false" prefWidth="295.0" text="New Cost" GridPane.columnSpan="2" />
                                 <Button fx:id="costsBtnNewDelete" mnemonicParsing="false" prefWidth="150.0" text="Delete Cost(s)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                 <Button fx:id="costsBtnNewDetails" mnemonicParsing="false" prefWidth="305.0" text="Show Details" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                <Button fx:id="costsBtnNewEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Cost" GridPane.rowIndex="1" />
+                                <Button fx:id="costsBtnEdit" mnemonicParsing="false" prefWidth="150.0" text="Edit Cost" GridPane.rowIndex="1" />
                                 <Button fx:id="costsBtnNewRefresh" mnemonicParsing="false" prefWidth="305.0" text="Refresh" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                             </GridPane>
                             <Region VBox.vgrow="ALWAYS" />

@@ -4,7 +4,9 @@ import classes.*;
 import classes.Object;
 import com.zaxxer.hikari.HikariDataSource;
 import controller.create.*;
-import controller.create.order.ControllerCreateOrder;
+import controller.create.ControllerCreateOrder;
+import controller.create.order.ControllerSetAdditionalData;
+import controller.edit.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -22,6 +24,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -863,7 +866,13 @@ public class ControllerMain implements Initializable {
         double finalCosts = PrintedAPI.round(costs);
         double finalSupportWeight = PrintedAPI.round(supportWeight);
         double finalWeight = PrintedAPI.round(weight);
-        double finalPricePerHour = PrintedAPI.round(finalSoldPrice/finalBuildTime*60);
+        double finalPricePerHour;
+
+        if (soldCount != 0){
+            finalPricePerHour = PrintedAPI.round(finalSoldPrice/finalBuildTime*60);
+        } else {
+            finalPricePerHour = 0;
+        }
 
 
         Platform.runLater(() -> {
@@ -878,7 +887,7 @@ public class ControllerMain implements Initializable {
                 objLabelSelectedBuildTime.setText(String.format("%s", PrintedAPI.formatTime(finalBuildTime).get()));
             }
 
-            objLabelSelectedPerHour.setText(finalPricePerHour + "$/h");
+            objLabelSelectedPerHour.setText(finalPricePerHour + " $/h");
         });
     }
 
@@ -1006,17 +1015,65 @@ public class ControllerMain implements Initializable {
 
         for (Order order : listOfOrders) {
 
+            ObservableList<OrderItem> orderItems = order.getOrderItems();
             int custId = order.getCustomerId();
 
+            //setting customer
             for(Customer cust : listOfCustomers) {
                 if(cust.getId() == custId) {
+                    order.setCustomer(cust);
                     custName = cust.getLastName() + " " + cust.getFirstName();
                     break;
                 }
             }
 
+            //adding corresponding orderItems to order
+            for(OrderItem item : listOfOrderItems) {
+                if(item.getOrderId() == order.getId()) {
+                    orderItems.add(item);
+                }
+            }
+
+            //adiing additional information (such as object name, color name, type name...) to OrderItems
+            for (OrderItem item : orderItems) {
+                //adding object to orderItem
+                for(Object obj : listOfObjects) {
+                    if (obj.getId() == item.getObject().getId()){
+                        //we cant just set object from Objects table as object of OrderItem becuase objects in Objects table don't
+                        //have price (which are variable). Also 3D printing service has variable weight and build time. There for we must
+                        //take object from Objects table as template for name and other information that orderItem does not store.
+                        // However, only orderItem contains actual prices and weights that we need. Just take a look at fields of those
+                        //2 tables and you will get it.
+
+                        //obj2 figures as object of orderItem. obj figures as object from Objects table.
+                        Object obj2 = item.getObject();
+                        obj2.setName(obj.getName());
+                        obj2.setBuildTimeFormatted(PrintedAPI.formatTime(obj2.getBuildTime()).get());
+                        obj2.setStlLink(obj.getStlLink());
+                        obj2.setComment(obj.getComment());
+                    }
+                }
+
+                //adding Printer to OrderItem
+                for (Printer printer : listOfPrinters){
+                    if (printer.getId() == item.getPrinter().getId()){
+                        item.setPrinter(printer);
+                        break;
+                    }
+                }
+
+                //adding material to OrderItem
+                for (Material material : listOfMaterials){
+                    if (material.getId() == item.getMaterial().getId()){
+                        item.setMaterial(material);
+                        break;
+                    }
+                }
+            }
+
             order.setCustomerName(custName);
 
+            //start of common statistics calculation
             buildTime += order.getBuildTime();
             weight += order.getWeight();
             supportWeight += order.getSupportWeight();
@@ -1210,6 +1267,16 @@ public class ControllerMain implements Initializable {
         calculateSelectedCostsStatistics(costsTv.getSelectionModel().getSelectedItems());
     });
 
+        costsTv.setRowFactory( tv -> {
+            TableRow<Cost> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    costsBtnEdit.fire();
+                }
+            });
+            return row;
+        });
+
     costsBtnCreate.setOnAction((event) -> {
         try{
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/create/ViewCreateCost.fxml"));
@@ -1224,8 +1291,12 @@ public class ControllerMain implements Initializable {
             stage.setMinWidth(400);
 
             stage.getScene().setOnKeyPressed(event1 -> {
-                if(event1.getCode() == KeyCode.ENTER){
-                    ctrl.getBtnCreate().fire();
+                switch (event1.getCode()) {
+                    case ENTER:
+                        ctrl.getBtnCreate().fire();
+                        break;
+                    case ESCAPE:
+                        PrintedAPI.closeWindow(ctrl.getBtnCreate());
                 }
             });
 
@@ -1243,9 +1314,56 @@ public class ControllerMain implements Initializable {
         }
     });
 
+    costsBtnEdit.setOnAction((event) -> {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/edit/ViewEditCost.fxml"));
+            Parent root1 = fxmlLoader.load();
+            ControllerEditCost ctrl = fxmlLoader.getController();
+            Stage stage = new Stage();
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Edit Cost");
+            stage.setScene(new Scene(root1));
+            stage.setMinHeight(440);
+            stage.setMinWidth(400);
+
+            stage.getScene().setOnKeyPressed(event1 -> {
+                switch (event1.getCode()) {
+                    case ENTER:
+                        ctrl.getBtnCreate().fire();
+                        break;
+                    case ESCAPE:
+                        PrintedAPI.closeWindow(ctrl.getBtnCreate());
+                }
+            });
+
+            stage.setResizable(false);
+            stage.centerOnScreen();
+
+            //passing credentials to main controller
+            ctrl.setDs(ds);
+            ctrl.setControllerMain(this);
+            ctrl.setFieldsValues(costsTv.getSelectionModel().getSelectedItems().get(0));
+            stage.show();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    });
+
     /*****************************          INITIALIZE PRINTERS TAB          *****************************/
     printersTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Printer> c) -> {
         calculateSelectedPrintersStatistics(printersTv.getSelectionModel().getSelectedItems());
+    });
+
+    printersTv.setRowFactory( tv -> {
+        TableRow<Printer> row = new TableRow<>();
+        row.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                printersBtnEdit.fire();
+            }
+        });
+        return row;
     });
 
     printersBtnCreate.setOnAction(event -> {
@@ -1262,8 +1380,12 @@ public class ControllerMain implements Initializable {
             stage.centerOnScreen();
 
             stage.getScene().setOnKeyPressed(event1 -> {
-                if(event1.getCode() == KeyCode.ENTER){
-                    ctrl.getBtnCreate().fire();
+                switch (event1.getCode()) {
+                    case ENTER:
+                        ctrl.getBtnCreate().fire();
+                        break;
+                    case ESCAPE:
+                        PrintedAPI.closeWindow(ctrl.getBtnCreate());
                 }
             });
 
@@ -1278,10 +1400,54 @@ public class ControllerMain implements Initializable {
         }
     });
 
+        printersBtnEdit.setOnAction(event -> {
+            try{
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/edit/ViewEditPrinter.fxml"));
+                Parent root1 = fxmlLoader.load();
+                ControllerEditPrinter ctrl = fxmlLoader.getController();
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setTitle("New Printer");
+
+                stage.setScene(new Scene(root1));
+                stage.setResizable(false);
+                stage.centerOnScreen();
+
+                stage.getScene().setOnKeyPressed(event1 -> {
+                    switch (event1.getCode()) {
+                        case ENTER:
+                            ctrl.getBtnCreate().fire();
+                            break;
+                        case ESCAPE:
+                            PrintedAPI.closeWindow(ctrl.getBtnCreate());
+                    }
+                });
+
+                //passing credentials to main controller
+                ctrl.setDs(ds);
+                ctrl.setControllerMain(this);
+                ctrl.setFieldsValues(printersTv.getSelectionModel().getSelectedItems().get(0));
+                stage.show();
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        });
+
 
     /*****************************          INITIALIZE MATERIALS TAB          *****************************/
     matTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Material> c) -> {
         calculateSelectedMaterialsStatistics(matTv.getSelectionModel().getSelectedItems());
+    });
+
+    matTv.setRowFactory( tv -> {
+        TableRow<Material> row = new TableRow<>();
+        row.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                matBtnEdit.fire();
+            }
+        });
+        return row;
     });
 
     matBtnCreate.setOnAction((event) -> {
@@ -1300,8 +1466,12 @@ public class ControllerMain implements Initializable {
                 stage.centerOnScreen();
 
                 stage.getScene().setOnKeyPressed(event1 -> {
-                    if(event1.getCode() == KeyCode.ENTER){
-                        ctrl.getBtnCreate().fire();
+                    switch (event1.getCode()) {
+                        case ENTER:
+                            ctrl.getBtnCreate().fire();
+                            break;
+                        case ESCAPE:
+                            PrintedAPI.closeWindow(ctrl.getBtnCreate());
                     }
                 });
 
@@ -1316,9 +1486,55 @@ public class ControllerMain implements Initializable {
             }
         });
 
+        matBtnEdit.setOnAction((event) -> {
+            try{
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/edit/ViewEditMaterial.fxml"));
+                Parent root1 = fxmlLoader.load();
+                ControllerEditMaterial ctrl = fxmlLoader.getController();
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setTitle("Edit Material");
+                stage.setMinHeight(440);
+                stage.setMinWidth(400);
+
+                stage.setScene(new Scene(root1));
+                stage.setResizable(false);
+                stage.centerOnScreen();
+
+                stage.getScene().setOnKeyPressed(event1 -> {
+                    switch (event1.getCode()) {
+                        case ENTER:
+                            ctrl.getBtnCreate().fire();
+                            break;
+                        case ESCAPE:
+                            PrintedAPI.closeWindow(ctrl.getBtnCreate());
+                    }
+                });
+
+                //passing credentials to main controller
+                ctrl.setDs(ds);
+                ctrl.setControllerMain(this);
+                ctrl.setFieldsValues(matTv.getSelectionModel().getSelectedItems().get(0));
+                stage.show();
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        });
+
     /*****************************          INITIALIZE OBJECTS TAB          *****************************/
     objTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Object> c) -> {
         calculateSelectedObjectsStatistics(objTv.getSelectionModel().getSelectedItems());
+    });
+
+    objTv.setRowFactory( tv -> {
+        TableRow<Object> row = new TableRow<>();
+        row.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                objBtnEdit.fire();
+            }
+        });
+        return row;
     });
 
     objBtnCreate.setOnAction(event -> {
@@ -1337,8 +1553,12 @@ public class ControllerMain implements Initializable {
             stage.centerOnScreen();
 
             stage.getScene().setOnKeyPressed(event1 -> {
-                if(event1.getCode() == KeyCode.ENTER){
-                    ctrl.getBtnCreate().fire();
+                switch (event1.getCode()) {
+                    case ENTER:
+                        ctrl.getBtnCreate().fire();
+                        break;
+                    case ESCAPE:
+                        PrintedAPI.closeWindow(ctrl.getBtnCreate());
                 }
             });
 
@@ -1352,9 +1572,55 @@ public class ControllerMain implements Initializable {
             e.printStackTrace();
         }
     });
+
+    objBtnEdit.setOnAction(event -> {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/edit/ViewEditObject.fxml"));
+            Parent root1 = fxmlLoader.load();
+            ControllerEditObject ctrl = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Edit Object");
+            //stage.setMinHeight(440);
+            // stage.setMinWidth(506);
+
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.centerOnScreen();
+
+            stage.getScene().setOnKeyPressed(event1 -> {
+                switch (event1.getCode()) {
+                    case ENTER:
+                        ctrl.getBtnCreate().fire();
+                        break;
+                    case ESCAPE:
+                        PrintedAPI.closeWindow(ctrl.getBtnCreate());
+                }
+            });
+
+            //passing credentials to main controller
+            ctrl.setDs(ds);
+            ctrl.setControllerMain(this);
+            ctrl.setFieldsValues(objTv.getSelectionModel().getSelectedItems().get(0));
+            stage.show();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    });
     /*****************************          INITIALIZE CUSTOMERS TAB          *****************************/
     custTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Customer> c) -> {
         calculateSelectedCustomersStatistics(custTv.getSelectionModel().getSelectedItems());
+    });
+
+    custTv.setRowFactory( tv -> {
+        TableRow<Customer> row = new TableRow<>();
+        row.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                custBtnEdit.fire();
+            }
+        });
+        return row;
     });
 
     custBtnCreate.setOnAction(event -> {
@@ -1373,8 +1639,12 @@ public class ControllerMain implements Initializable {
             stage.centerOnScreen();
 
             stage.getScene().setOnKeyPressed(event1 -> {
-                if(event1.getCode() == KeyCode.ENTER){
-                    ctrl.getBtnCreate().fire();
+                switch (event1.getCode()) {
+                    case ENTER:
+                        ctrl.getBtnCreate().fire();
+                        break;
+                    case ESCAPE:
+                        PrintedAPI.closeWindow(ctrl.getBtnCreate());
                 }
             });
 
@@ -1389,9 +1659,56 @@ public class ControllerMain implements Initializable {
         }
     });
 
+    custBtnEdit.setOnAction(event -> {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/edit/ViewEditCustomer.fxml"));
+            Parent root1 = fxmlLoader.load();
+            ControllerEditCustomer ctrl = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("New Customer");
+            //stage.setMinHeight(440);
+            //stage.setMinWidth(506);
+
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.centerOnScreen();
+
+            stage.getScene().setOnKeyPressed(event1 -> {
+                switch (event1.getCode()) {
+                    case ENTER:
+                        ctrl.getBtnCreate().fire();
+                        break;
+                    case ESCAPE:
+                        PrintedAPI.closeWindow(ctrl.getBtnCreate());
+                        break;
+                }
+            });
+
+            //passing credentials to main controller
+            ctrl.setDs(ds);
+            ctrl.setControllerMain(this);
+            ctrl.setFieldsValues(custTv.getSelectionModel().getSelectedItems().get(0));
+            stage.show();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    });
+
     /*****************************          INITIALIZE ORDERS TAB          *****************************/
     ordersTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Order> c) -> {
         calculateSelectedOrdersStatistics(ordersTv.getSelectionModel().getSelectedItems());
+    });
+
+    ordersTv.setRowFactory( tv -> {
+        TableRow<Order> row = new TableRow<>();
+        row.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                ordersBtnEdit.fire();
+            }
+        });
+        return row;
     });
 
     ordersBtnCreate.setOnAction(event -> {
@@ -1401,7 +1718,7 @@ public class ControllerMain implements Initializable {
             ControllerCreateOrder ctrl = fxmlLoader.getController();
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("New Object");
+            stage.setTitle("New Order");
 
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
@@ -1409,8 +1726,12 @@ public class ControllerMain implements Initializable {
             stage.show();
 
             stage.getScene().setOnKeyPressed(event1 -> {
-                if(event1.getCode() == KeyCode.ENTER){
-                    ctrl.getBtnCreate().fire();
+                switch (event1.getCode()) {
+                    case ENTER:
+                        ctrl.getBtnCreate().fire();
+                        break;
+                    case ESCAPE:
+                        PrintedAPI.closeWindow(ctrl.getBtnCreate());
                 }
             });
 
@@ -1420,6 +1741,39 @@ public class ControllerMain implements Initializable {
             ctrl.setFieldsValues();
 
 
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    });
+
+    ordersBtnEdit.setOnAction(event -> {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/edit/ViewEditOrder.fxml"));
+            Parent root1 = fxmlLoader.load();
+            ControllerEditOrder ctrl = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Edit Order");
+
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.centerOnScreen();
+            stage.show();
+
+            stage.getScene().setOnKeyPressed(event1 -> {
+                switch (event1.getCode()) {
+                    case ENTER:
+                        ctrl.getBtnCreate().fire();
+                        break;
+                    case ESCAPE:
+                        PrintedAPI.closeWindow(ctrl.getBtnCreate());
+                }
+            });
+
+            //passing credentials to main controller
+            ctrl.setDs(ds);
+            ctrl.setControllerMain(this);
+            ctrl.setFieldsValues(ordersTv.getSelectionModel().getSelectedItems().get(0));
         }catch (IOException e){
             e.printStackTrace();
         }

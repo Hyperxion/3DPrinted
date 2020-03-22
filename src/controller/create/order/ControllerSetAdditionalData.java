@@ -1,6 +1,9 @@
 package controller.create.order;
 
 import classes.*;
+import controller.create.ControllerCreateOrder;
+import controller.edit.ControllerEditOrder;
+import controller.main.ControllerMain;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,8 +25,13 @@ import java.util.ResourceBundle;
 public class ControllerSetAdditionalData implements Initializable {
 
     private ControllerCreateOrder controllerCreateOrder;
+    private ControllerEditOrder controllerEditOrder;
+    private ControllerMain controllerMain;
+
     private OrderItem selectedItem;
     private Material selectedMaterial;
+
+    private boolean isCreated = true;
 
     @FXML
     private ComboBox<Printer> comboBoxPrinter;
@@ -112,13 +120,17 @@ public class ControllerSetAdditionalData implements Initializable {
                 stage.show();
 
                 stage.getScene().setOnKeyPressed(event1 -> {
-                    if(event1.getCode() == KeyCode.ENTER){
-                        ctrl.getBtnSelect().fire();
+                    switch (event1.getCode()) {
+                        case ENTER:
+                            ctrl.getBtnSelect().fire();
+                            break;
+                        case ESCAPE:
+                            PrintedAPI.closeWindow(ctrl.getBtnSelect());
                     }
                 });
 
                 ctrl.setControllerSetAdditionalData(this);
-                ctrl.setFields(controllerCreateOrder.getListOfNotSpentMaterials());
+                ctrl.setFields(controllerMain.getListOfNotSpentMaterials());
 
             } catch (IOException e){
                 e.printStackTrace();
@@ -127,8 +139,15 @@ public class ControllerSetAdditionalData implements Initializable {
 
         btnAssign.setOnAction(event -> {
             if (assignValues())PrintedAPI.closeWindow(btnAssign);
-            controllerCreateOrder.getTvSelectedObjects().refresh();
-            controllerCreateOrder.calculateStats();
+
+            if (isCreated) {
+                controllerCreateOrder.getTvSelectedObjects().refresh();
+                controllerCreateOrder.calculateStats();
+            } else {
+                controllerEditOrder.getTvSelectedObjects().refresh();
+                controllerEditOrder.calculateStats();
+            }
+
         });
 
         btnCancel.setOnAction(event -> PrintedAPI.closeWindow(btnCancel));
@@ -225,7 +244,7 @@ public class ControllerSetAdditionalData implements Initializable {
 
         labelEditedObject.setText(String.format("%d; %s", id, name));
 
-        ObservableList<Printer> printers = controllerCreateOrder.getListOfPrinters();
+        ObservableList<Printer> printers = controllerMain.getListOfPrinters();
         comboBoxPrinter.setItems(printers);
         comboBoxPrinter.setVisibleRowCount(7);
         comboBoxPrinter.setConverter(new StringConverter<Printer>() {
@@ -251,7 +270,7 @@ public class ControllerSetAdditionalData implements Initializable {
     }
 
     //this one is used when calculating costs using selected item, i. e. when it is double clicked from new order dialog
-    protected void calculateCosts(OrderItem selectedItem){
+    public void calculateCosts(OrderItem selectedItem){
         try {
 
             Material selectedMaterial = selectedItem.getMaterial();
@@ -273,7 +292,7 @@ public class ControllerSetAdditionalData implements Initializable {
     }
 
     //this one is used with values from text fields when changing material, weight or quantity information in setAdditionalData dialog
-    protected void calculateCosts(){
+    public void calculateCosts(){
         try {
 
             double costs;
@@ -297,7 +316,7 @@ public class ControllerSetAdditionalData implements Initializable {
     //only weights, build time and price. There we will lock quantity field and unlock rest of the text fields.
     //In case that it is predefined object, we will want to change only quantity and price - all other information are predefined in Objects tab.
     //All in all, we must define 3D printing object in Objects tab with id = 1
-    protected void unlockFields(){
+    public void unlockFields(){
         int id = selectedItem.getObject().getId();
 
         switch (id){
@@ -329,5 +348,17 @@ public class ControllerSetAdditionalData implements Initializable {
 
     public Button getBtnAssign() {
         return btnAssign;
+    }
+
+    public void setControllerEditOrder(ControllerEditOrder controllerEditOrder) {
+        this.controllerEditOrder = controllerEditOrder;
+    }
+
+    public void setControllerMain(ControllerMain controllerMain) {
+        this.controllerMain = controllerMain;
+    }
+
+    public void setCreated(boolean created) {
+        isCreated = created;
     }
 }

@@ -5,14 +5,12 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
@@ -75,7 +73,7 @@ public class PrintedAPI {
         return bd.doubleValue();
     }
 
-    //method for rounding double numbers
+    //method for rounding double numbers with places parameter
     public static double round(double value, int places) {
         BigDecimal bd = new BigDecimal(value);
 
@@ -188,6 +186,64 @@ public class PrintedAPI {
             }//end finally try
         }//end try
     return currentAutoIncrementValue;
+    }
+
+    //with this method we can perform simple one-time queries - update or delete
+    public static void performSimpleQuery(String query, Label info, HikariDataSource ds){
+        //Create query
+        String updateQuery = query;
+
+        Connection conn = null;
+        Statement stmt = null;
+
+        try {
+
+            //STEP 2: Register JDBC driver
+            Class.forName("org.mariadb.jdbc.Driver");
+
+            //STEP 3: Open a connection
+
+            conn = ds.getConnection();
+            if(conn.isValid(15) == false) {
+                System.out.print("Connection Lost");
+            }
+            //STEP 4: Execute a query
+            stmt = conn.createStatement();
+
+            stmt.executeUpdate(updateQuery);
+
+
+        } catch (SQLIntegrityConstraintViolationException e){
+
+            String[] message = e.getMessage().split("`");
+            String table = message[3];
+            table = table.replaceAll("\\d+", "").replaceAll("(.)([A-Z])", "$1 $2");
+            info.setText("Remove related " + table + " first.");
+            info.setTextFill(Color.web("#ff0000"));
+
+        } catch (SQLNonTransientConnectionException se) {
+//            MngApi obj = new MngApi();
+//            obj.alertConnectionLost();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null)
+                    conn.close();
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
     }
 
 }

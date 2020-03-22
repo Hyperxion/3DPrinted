@@ -1,8 +1,11 @@
-package controller.create.order;
+package controller.create;
 
 import classes.*;
 import classes.Object;
 import com.zaxxer.hikari.HikariDataSource;
+import controller.create.order.ControllerSelectCustomer;
+import controller.create.order.ControllerSelectObject;
+import controller.create.order.ControllerSetAdditionalData;
 import controller.main.ControllerMain;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -89,12 +92,17 @@ public class ControllerCreateOrder implements Initializable {
                 stage.centerOnScreen();
 
                 stage.getScene().setOnKeyPressed(event1 -> {
-                    if(event1.getCode() == KeyCode.ENTER){
-                        ctrl.getBtnSelect().fire();
+                    switch (event1.getCode()) {
+                        case ENTER:
+                            ctrl.getBtnSelect().fire();
+                            break;
+                        case ESCAPE:
+                            PrintedAPI.closeWindow(ctrl.getBtnSelect());
                     }
                 });
 
                 ctrl.setControllerCreateOrder(this);
+                ctrl.setControllerMain(controllerMain);
                 ctrl.loadCustomers();
 
                 stage.show();
@@ -106,7 +114,7 @@ public class ControllerCreateOrder implements Initializable {
         btnCreate.setOnAction(event -> {
             if (createOrder()) {
                 Order.insertUpdateOrder(newOrder, ds);
-                OrderItem.insertUpdateOrderItem(newOrder.getOrderItems(), ds, PrintedAPI.getCurrentAutoIncrementValue(ds, "OrderItems"));
+                OrderItem.insertUpdateOrderItem(orderItems, ds, PrintedAPI.getCurrentAutoIncrementValue(ds, "OrderItems"));
                 PrintedAPI.closeWindow(btnCreate);
                 controllerMain.getListOfOrders().add(0, newOrder);
                 controllerMain.getOrdersTv().refresh();
@@ -129,13 +137,19 @@ public class ControllerCreateOrder implements Initializable {
                 stage.centerOnScreen();
 
                 stage.getScene().setOnKeyPressed(event1 -> {
-                    if(event1.getCode() == KeyCode.ENTER){
-                        ctrl.getBtnSelect().fire();
+                    switch (event1.getCode()) {
+                        case ENTER:
+                            ctrl.getBtnSelect().fire();
+                            break;
+                        case ESCAPE:
+                            PrintedAPI.closeWindow(ctrl.getBtnSelect());
                     }
                 });
 
                 ctrl.setControllerCreateOrder(this);
+                ctrl.setControllerMain(controllerMain);
                 ctrl.loadObjects();
+                ctrl.setCreated(true);
 
                 stage.show();
             }catch (IOException e){
@@ -165,12 +179,17 @@ public class ControllerCreateOrder implements Initializable {
                         stage.show();
 
                         stage.getScene().setOnKeyPressed(event1 -> {
-                            if(event1.getCode() == KeyCode.ENTER){
-                                ctrl.getBtnAssign().fire();
+                            switch (event1.getCode()) {
+                                case ENTER:
+                                    ctrl.getBtnAssign().fire();
+                                    break;
+                                case ESCAPE:
+                                    PrintedAPI.closeWindow(ctrl.getBtnAssign());
                             }
                         });
 
                         ctrl.setControllerCreateOrder(this);
+                        ctrl.setControllerMain(controllerMain);
                         ctrl.setFieldsValues(tvSelectedObjects.getSelectionModel().getSelectedItem());
                         ctrl.calculateCosts(tvSelectedObjects.getSelectionModel().getSelectedItem());
                         ctrl.unlockFields();
@@ -215,11 +234,9 @@ public class ControllerCreateOrder implements Initializable {
         tvSelectedObjects.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
-    protected void calculateStats(){
+    public void calculateStats(){
         double price = 0, weight = 0, supportWeight = 0, costs = 0, pricePerMinute;
         int buildTime = 0, quantity = 0;
-
-        ObservableList<OrderItem> orderItems = tvSelectedObjects.getItems();
 
         for (OrderItem item : orderItems) {
             price += item.getObject().getSoldPrice();
@@ -249,8 +266,6 @@ public class ControllerCreateOrder implements Initializable {
             SimpleIntegerProperty id, buildTime, quantity;
             SimpleStringProperty status, comment, dateCreated, dueDate;
             SimpleDoubleProperty costs, price, weight, supportWeight;
-
-            ObservableList<OrderItem> orderItems = tvSelectedObjects.getItems();
 
             if (PrintedAPI.areTxtFieldsEmpty(txtFieldCustomer)){
                 labelInfo.setText("Customer field cannot be empty. Please, click on Select button and choose one.");

@@ -2,6 +2,9 @@ package controller.create.order;
 
 import classes.Customer;
 import classes.PrintedAPI;
+import controller.create.ControllerCreateOrder;
+import controller.edit.ControllerEditOrder;
+import controller.main.ControllerMain;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,8 +16,12 @@ import java.util.ResourceBundle;
 
 public class ControllerSelectCustomer implements Initializable {
 
-    ControllerCreateOrder controllerCreateOrder = null;
-    ObservableList<Customer> listOfCustomers;
+    private ControllerCreateOrder controllerCreateOrder = null;
+    private ControllerEditOrder controllerEditOrder;
+    private ControllerMain controllerMain;
+    private ObservableList<Customer> listOfCustomers;
+
+    private boolean isCreated = true;
 
     @FXML
     private TableView<Customer> tvCustomers;
@@ -36,7 +43,12 @@ public class ControllerSelectCustomer implements Initializable {
         initializeCols();
 
         btnSelect.setOnAction(event -> {
-            controllerCreateOrder.setCustomer(tvCustomers.getSelectionModel().getSelectedItem());
+            if (isCreated){
+                controllerCreateOrder.setCustomer(tvCustomers.getSelectionModel().getSelectedItem());
+            } else {
+                controllerEditOrder.setCustomer(tvCustomers.getSelectionModel().getSelectedItem());
+            }
+
             PrintedAPI.closeWindow(btnSelect);
         });
 
@@ -56,7 +68,7 @@ public class ControllerSelectCustomer implements Initializable {
     }
 
     public void loadCustomers() {
-        listOfCustomers = controllerCreateOrder.getListOfCustomers();
+        listOfCustomers = controllerMain.getListOfCustomers();
         tvCustomers.setItems(listOfCustomers);
     }
 
@@ -99,5 +111,17 @@ public class ControllerSelectCustomer implements Initializable {
 
     public Button getBtnSelect() {
         return btnSelect;
+    }
+
+    public void setControllerEditOrder(ControllerEditOrder controllerEditOrder) {
+        this.controllerEditOrder = controllerEditOrder;
+    }
+
+    public void setControllerMain(ControllerMain controllerMain) {
+        this.controllerMain = controllerMain;
+    }
+
+    public void setCreated(boolean created) {
+        isCreated = created;
     }
 }

@@ -40,8 +40,8 @@ public class Order {
         this.supportWeight = supportWeight;
         this.customerName = new SimpleStringProperty("Dunno");
         this.buildTimeFormatted = PrintedAPI.formatTime(buildTime.get());
-        this.orderItems = null;
-        this.customer = null;
+        this.orderItems = FXCollections.observableArrayList();
+        this.customer = new Customer(customerId);
     }
 
     //this constructor is used only for purpose of inserting order into database table. Since we dont need customer name (we will use their id)

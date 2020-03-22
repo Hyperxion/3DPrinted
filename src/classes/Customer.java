@@ -196,6 +196,25 @@ public class Customer {
         this.ordersPrice = new SimpleDoubleProperty(0);
     }
 
+    public Customer(SimpleIntegerProperty customerId) {
+        this.lastName = new SimpleStringProperty();
+        this.firstName = new SimpleStringProperty();
+        this.dateCreated = new SimpleStringProperty();
+        this.mail = new SimpleStringProperty();
+        this.phone = new SimpleStringProperty();
+        this.address = new SimpleStringProperty();
+        this.city = new SimpleStringProperty();
+        this.zipCode = new SimpleStringProperty();
+        this.comment = new SimpleStringProperty();
+        this.id = customerId;
+        this.companyId = new SimpleIntegerProperty();
+        this.countryId = new SimpleIntegerProperty();
+        this.country = new SimpleStringProperty("null");
+        this.company = new SimpleStringProperty("null");
+        this.orderCount = new SimpleIntegerProperty(0);
+        this.ordersPrice = new SimpleDoubleProperty(0);
+    }
+
     public String getLastName() {
         return lastName.get();
     }
