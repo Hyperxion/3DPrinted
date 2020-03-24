@@ -5,7 +5,6 @@ import classes.Object;
 import com.zaxxer.hikari.HikariDataSource;
 import controller.create.*;
 import controller.create.ControllerCreateOrder;
-import controller.create.order.ControllerSetAdditionalData;
 import controller.edit.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -19,12 +18,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -242,6 +238,148 @@ public class ControllerMain implements Initializable {
 
 
     /*****************************          GENERAL METHODS       *****************************/
+    //calculate statistic for all tables included Statistics tab
+    public void calculateAllStatistics(){
+
+        int quantity = 0, itemsPrinted, remainingRolls, soldRolls, colors, types, buildTime, total, sold, notSold;
+        double price = 0, shipping = 0, duty, tax, totalExpenses, priceInclExpenses, printersIncome, totalPrice,
+               weight, trash, revenue, soldWeight, remainingWeight, totalWeight, profit,
+               soldPrice, soldCosts, notSoldPrice, notSoldCosts, totalCosts = 0, pricePerHour, supportWeight;
+       
+        //calculate Costs statistics
+        if(!listOfCosts.isEmpty()){
+            for (Cost cost : listOfCosts) {
+                quantity += cost.getQuantity();
+                price += cost.getPrice();
+                shipping += cost.getShipping();
+            }
+
+            costsLabelTotal.setText("Total (" + listOfCosts.size() + ")");
+            costsLabelTotalQuantity.setText("" + quantity);
+            costsLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f)", shipping, price, shipping + price));
+        }
+
+        //calculate Printers statistics
+        if(!listOfPrinters.isEmpty()){
+            itemsPrinted = 0;
+            price = 0; shipping = 0; duty = 0; tax = 0; totalExpenses = 0; priceInclExpenses = 0; printersIncome = 0; totalPrice = 0;
+
+            for (Printer printer : listOfPrinters){
+                shipping += printer.getShipping();
+                price += printer.getPrice();
+                duty += printer.getDuty();
+                tax += printer.getTax();
+                totalPrice += printer.getShipping() + printer.getPrice() + printer.getDuty() + printer.getTax();
+                totalExpenses += printer.getExpenses();
+                printersIncome += printer.getIncomes();
+            }
+
+            priceInclExpenses += totalPrice + totalExpenses;
+
+            printersLabelTotal.setText("Total (" + listOfPrinters.size() + ")");
+            printersLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f $)", shipping, price, shipping + price));
+            printersLabelTotalDutyTaxTotal.setText(String.format("%.2f $/%.2f $ ( %.2f $)", duty, tax, duty + tax));
+            printersLabelTotalPriceOfPrinters.setText(totalPrice + " $");
+            printersLabelTotalExpenses.setText(totalExpenses + " $");
+            printersLabelTotalPriceInclExpenses.setText(priceInclExpenses + " $");
+            printersLabelTotalIncomesProfit.setText(String.format("%.2f $ (%.2f $)", printersIncome, printersIncome - priceInclExpenses));
+            printersLabelTotalItemsPrinted.setText(itemsPrinted + "");
+        }
+
+        //calculating Materials statistics
+        if(!listOfMaterials.isEmpty()){
+            colors = 0; types = 0; soldRolls = 0; remainingRolls = 0;
+            shipping = 0; price = 0; revenue = 0; totalWeight = 0; soldWeight = 0; remainingWeight = 0;
+            trash = 0; profit = 0;
+
+            for (Material material : listOfMaterials){
+                //setting label values
+                shipping += material.getShipping();
+                price += material.getPrice();
+                trash += material.getTrash();
+
+                revenue += material.getSoldFor();
+                profit += material.getProfit();
+                totalWeight += material.getWeight();
+
+                if (material.isSold())soldRolls++;
+                if (!material.isSold())remainingRolls++;
+
+                soldWeight += material.getUsed();
+                remainingWeight += material.getRemaining();
+            }
+
+            for (SimpleTableObject obj : commonMaterialProperties){
+                int id = obj.getPropertyTypeId();
+
+                switch (id) {
+                    case 1:
+                        types++;
+                        continue;
+                    case 2:
+                        colors++;
+                        continue;
+                    default:
+                        
+                }
+            }
+
+            matLabelTotal.setText("Total(" + listOfMaterials.size() + ")");
+            matLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f $)", shipping, price, shipping + price));
+            matLabelTotalRevenueProfit.setText(revenue + " $/" + profit + " $");
+            matLabelTotalWeightRolls.setText(String.format("%.2f kg/%d rolls", totalWeight/1000, soldRolls + remainingRolls));
+            matLabelTotalSoldWeightRolls.setText(String.format("%.2f kg/%d rolls", soldWeight/1000, soldRolls));
+            matLabelTotalRemainingWeightRolls.setText(String.format("%.2f kg/%d rolls", remainingWeight/1000, remainingRolls));
+            matLabelTotalAvgRollBuySellPrice.setText(String.format("%.2f $/ %.2f $", price/listOfMaterials.size(), revenue/listOfMaterials.size()));
+            matLabelTotalTrash.setText(trash/1000 + " kg");
+            matLabelTotalColorsTypes.setText(colors + "/" + types);
+        }
+
+        //calculating objects statistics
+        objLabelTotal.setText(listOfObjects.size() + "");
+
+        //calculating customer statistics
+        custLabelTotal.setText(listOfObjects.size() + "");
+        
+        //calculating orders statistics
+        if(!listOfOrders.isEmpty() || !listOfOrderItems.isEmpty()){
+            //declaration of variables used for labels
+            soldPrice = 0; soldCosts = 0; notSoldPrice = 0; notSoldCosts = 0; weight = 0; supportWeight = 0;
+            buildTime = 0; itemsPrinted = listOfOrderItems.size(); total = listOfOrders.size(); sold = 0; notSold = 0;
+            
+            for (Order order : listOfOrders) {
+                //start of common statistics calculation
+                buildTime += order.getBuildTime();
+                weight += order.getWeight();
+                supportWeight += order.getSupportWeight();
+                itemsPrinted += order.getQuantity();
+
+                if (order.getStatus().equals("Sold")) {
+                    soldPrice += order.getPrice();
+                    soldCosts += order.getCosts();
+                    sold++;
+                } else if (order.getStatus().equals("Not Sold")) {
+                    notSoldPrice += order.getPrice();
+                    notSoldCosts += order.getCosts();
+                    notSold++;
+                }
+            }
+            
+            pricePerHour = (soldPrice + notSoldPrice)/buildTime*60;
+           
+            ordersLabelNotSold.setText("Not Sold (" + notSold + ")");
+            ordersLabelSold.setText("Not Sold (" + sold + ")");
+            ordersLabelTotal.setText("Total(" + total + ")");
+            ordersLabelSoldPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", soldPrice, soldCosts, soldPrice - soldCosts));
+            ordersLabelNotSoldPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", notSoldPrice, notSoldCosts, notSoldPrice - notSoldCosts));
+            ordersLabelTotalPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", soldPrice + notSoldPrice, soldCosts + notSoldCosts, (soldPrice + notSoldPrice) - (soldCosts + notSoldCosts)));
+            ordersLabelTotalPerHour.setText(String.format("%.2f $/h", pricePerHour));
+            ordersLabelTotalWeightSupports.setText(String.format("%.2f kg/%.2f kg", weight/1000, supportWeight/1000));
+            ordersLabelTotalBuildTime.setText(buildTime + "");
+            ordersLabelTotalItemsPrinted.setText(itemsPrinted + "");
+        }
+    }
+
 
     //setCellValueFactory for or columns in costs table view
     public void initializeCols(){
@@ -263,105 +401,105 @@ public class ControllerMain implements Initializable {
         costsTv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         //PRINTERS COLUMNS*********************************************************
-        printersColName.setCellValueFactory((param) -> {return param.getValue().nameProperty();});
-        printersColPurchaseDate.setCellValueFactory((param) -> {return param.getValue().purchaseDateProperty();});
-        printersColType.setCellValueFactory((param) -> {return param.getValue().typeProperty();});
-        printersColComment.setCellValueFactory((param) -> {return param.getValue().commentProperty();});
+        printersColName.setCellValueFactory((param) -> param.getValue().nameProperty());
+        printersColPurchaseDate.setCellValueFactory((param) -> param.getValue().purchaseDateProperty());
+        printersColType.setCellValueFactory((param) -> param.getValue().typeProperty());
+        printersColComment.setCellValueFactory((param) -> param.getValue().commentProperty());
 
-        printersColId.setCellValueFactory((param) -> {return param.getValue().idProperty().asObject();});
-        printersColItemsSold.setCellValueFactory((param) -> {return param.getValue().itemsSoldProperty().asObject();});
+        printersColId.setCellValueFactory((param) -> param.getValue().idProperty().asObject());
+        printersColItemsSold.setCellValueFactory((param) -> param.getValue().itemsSoldProperty().asObject());
 
-        printersColPrice.setCellValueFactory((param) -> {return param.getValue().priceProperty().asObject();});
-        printersColShipping.setCellValueFactory((param) -> {return param.getValue().shippingProperty().asObject();});
-        printersColIncomes.setCellValueFactory((param) -> {return param.getValue().incomesProperty().asObject();});
-        printersColExpenses.setCellValueFactory((param) -> {return param.getValue().expensesProperty().asObject();});
-        printersColOverallIncome.setCellValueFactory((param) -> {return param.getValue().overallIncomeProperty().asObject();});
-        printersColDuty.setCellValueFactory((param) -> {return param.getValue().dutyProperty().asObject();});
-        printersColTax.setCellValueFactory((param) -> {return param.getValue().taxProperty().asObject();});
+        printersColPrice.setCellValueFactory((param) -> param.getValue().priceProperty().asObject());
+        printersColShipping.setCellValueFactory((param) -> param.getValue().shippingProperty().asObject());
+        printersColIncomes.setCellValueFactory((param) ->  param.getValue().incomesProperty().asObject());
+        printersColExpenses.setCellValueFactory((param) ->  param.getValue().expensesProperty().asObject());
+        printersColOverallIncome.setCellValueFactory((param) -> param.getValue().overallIncomeProperty().asObject());
+        printersColDuty.setCellValueFactory((param) ->  param.getValue().dutyProperty().asObject());
+        printersColTax.setCellValueFactory((param) ->  param.getValue().taxProperty().asObject());
 
         //Centering content
         PrintedAPI.centerColumns(printersTv.getColumns());
         printersTv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         //MATERIALS COLUMNS*********************************************************
-        matColColor.setCellValueFactory((param) -> {return param.getValue().colorProperty();});
-        matColSeller.setCellValueFactory((param) -> {return param.getValue().sellerProperty();});
-        matColFinished.setCellValueFactory((param) -> {return param.getValue().finishedProperty();});
-        matColManufacturer.setCellValueFactory((param) -> {return param.getValue().manufacturerProperty();});
-        matColPurchDate.setCellValueFactory((param) -> {return param.getValue().purchaseDateProperty();});
-        matColType.setCellValueFactory((param) -> {return param.getValue().typeProperty();});
-        matColComment.setCellValueFactory((param) -> {return param.getValue().commentProperty();});
+        matColColor.setCellValueFactory((param) -> param.getValue().colorProperty());
+        matColSeller.setCellValueFactory((param) -> param.getValue().sellerProperty());
+        matColFinished.setCellValueFactory((param) -> param.getValue().finishedProperty());
+        matColManufacturer.setCellValueFactory((param) -> param.getValue().manufacturerProperty());
+        matColPurchDate.setCellValueFactory((param) -> param.getValue().purchaseDateProperty());
+        matColType.setCellValueFactory((param) -> param.getValue().typeProperty());
+        matColComment.setCellValueFactory((param) -> param.getValue().commentProperty());
 
-        matColId.setCellValueFactory((param) -> {return param.getValue().idProperty().asObject();});
-        matColWeight.setCellValueFactory((param) -> {return param.getValue().weightProperty().asObject();});
+        matColId.setCellValueFactory((param) -> param.getValue().idProperty().asObject());
+        matColWeight.setCellValueFactory((param) -> param.getValue().weightProperty().asObject());
 
-        matColRemaining.setCellValueFactory((param) -> {return param.getValue().remainingProperty().asObject();});
-        matColDiameter.setCellValueFactory((param) -> {return param.getValue().diameterProperty().asObject();});
-        matColPrice.setCellValueFactory((param) -> {return param.getValue().priceProperty().asObject();});
-        matColShipping.setCellValueFactory((param) -> {return param.getValue().shippingProperty().asObject();});
-        matColProfit.setCellValueFactory((param) -> {return param.getValue().profitProperty().asObject();});
-        matColSoldFor.setCellValueFactory((param) -> {return param.getValue().soldForProperty().asObject();});
-        matColTrash.setCellValueFactory((param) -> {return param.getValue().trashProperty().asObject();});
-        matColUsed.setCellValueFactory((param) -> {return param.getValue().usedProperty().asObject();});
+        matColRemaining.setCellValueFactory((param) -> param.getValue().remainingProperty().asObject());
+        matColDiameter.setCellValueFactory((param) -> param.getValue().diameterProperty().asObject());
+        matColPrice.setCellValueFactory((param) -> param.getValue().priceProperty().asObject());
+        matColShipping.setCellValueFactory((param) -> param.getValue().shippingProperty().asObject());
+        matColProfit.setCellValueFactory((param) -> param.getValue().profitProperty().asObject());
+        matColSoldFor.setCellValueFactory((param) -> param.getValue().soldForProperty().asObject());
+        matColTrash.setCellValueFactory((param) -> param.getValue().trashProperty().asObject());
+        matColUsed.setCellValueFactory((param) -> param.getValue().usedProperty().asObject());
 
         //Centering content
         PrintedAPI.centerColumns(matTv.getColumns());
         matTv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         //OBJECTS COLUMNS*********************************************************
-        objColName.setCellValueFactory((param) -> {return param.getValue().nameProperty();});
-        objColStlLink.setCellValueFactory((param) -> {return param.getValue().stlLinkProperty();});
-        objColBuildTimeFormatted.setCellValueFactory((param) -> {return param.getValue().buildTimeFormattedProperty();});
-        objColComment.setCellValueFactory((param) -> {return param.getValue().commentProperty();});
+        objColName.setCellValueFactory((param) -> param.getValue().nameProperty());
+        objColStlLink.setCellValueFactory((param) -> param.getValue().stlLinkProperty());
+        objColBuildTimeFormatted.setCellValueFactory((param) -> param.getValue().buildTimeFormattedProperty());
+        objColComment.setCellValueFactory((param) -> param.getValue().commentProperty());
 
-        objColId.setCellValueFactory((param) -> {return param.getValue().idProperty().asObject();});
-        objColCount.setCellValueFactory((param) -> {return param.getValue().soldCountProperty().asObject();});
+        objColId.setCellValueFactory((param) -> param.getValue().idProperty().asObject());
+        objColCount.setCellValueFactory((param) -> param.getValue().soldCountProperty().asObject());
 
-        objColWeight.setCellValueFactory((param) -> {return param.getValue().weightProperty().asObject();});
-        objColSupportWeight.setCellValueFactory((param) -> {return param.getValue().supportWeightProperty().asObject();});
-        objColSoldPrice.setCellValueFactory((param) -> {return param.getValue().soldPriceProperty().asObject();});
-        objColCosts.setCellValueFactory((param) -> {return param.getValue().costsProperty().asObject();});
+        objColWeight.setCellValueFactory((param) -> param.getValue().weightProperty().asObject());
+        objColSupportWeight.setCellValueFactory((param) -> param.getValue().supportWeightProperty().asObject());
+        objColSoldPrice.setCellValueFactory((param) -> param.getValue().soldPriceProperty().asObject());
+        objColCosts.setCellValueFactory((param) -> param.getValue().costsProperty().asObject());
 
         //Centering content
         PrintedAPI.centerColumns(objTv.getColumns());
         objTv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         //CUSTOMERS COLUMNS*********************************************************
-        custColLastName.setCellValueFactory((param) -> {return param.getValue().lastNameProperty();});
-        custColFirstName.setCellValueFactory((param) -> {return param.getValue().firstNameProperty();});
-        custColDateCreated.setCellValueFactory((param) -> {return param.getValue().dateCreatedProperty();});
-        custColMail.setCellValueFactory((param) -> {return param.getValue().mailProperty();});
-        custColPhone.setCellValueFactory((param) -> {return param.getValue().phoneProperty();});
-        custColAddress.setCellValueFactory((param) -> {return param.getValue().addressProperty();});
-        custColCity.setCellValueFactory((param) -> {return param.getValue().cityProperty();});
-        custColZipCode.setCellValueFactory((param) -> {return param.getValue().zipCodeProperty();});
-        custColCountry.setCellValueFactory((param) -> {return param.getValue().countryProperty();});
-        custColCompany.setCellValueFactory((param) -> {return param.getValue().companyProperty();});
-        custColComment.setCellValueFactory((param) -> {return param.getValue().commentProperty();});
+        custColLastName.setCellValueFactory((param) -> param.getValue().lastNameProperty());
+        custColFirstName.setCellValueFactory((param) -> param.getValue().firstNameProperty());
+        custColDateCreated.setCellValueFactory((param) -> param.getValue().dateCreatedProperty());
+        custColMail.setCellValueFactory((param) -> param.getValue().mailProperty());
+        custColPhone.setCellValueFactory((param) -> param.getValue().phoneProperty());
+        custColAddress.setCellValueFactory((param) -> param.getValue().addressProperty());
+        custColCity.setCellValueFactory((param) -> param.getValue().cityProperty());
+        custColZipCode.setCellValueFactory((param) -> param.getValue().zipCodeProperty());
+        custColCountry.setCellValueFactory((param) -> param.getValue().countryProperty());
+        custColCompany.setCellValueFactory((param) -> param.getValue().companyProperty());
+        custColComment.setCellValueFactory((param) -> param.getValue().commentProperty());
 
-        custColId.setCellValueFactory((param) -> {return param.getValue().idProperty().asObject();});
-        custColOrderCount.setCellValueFactory((param) -> {return param.getValue().orderCountProperty().asObject();});
+        custColId.setCellValueFactory((param) -> param.getValue().idProperty().asObject());
+        custColOrderCount.setCellValueFactory((param) -> param.getValue().orderCountProperty().asObject());
 
-        custColOrdersPrice.setCellValueFactory((param) -> {return param.getValue().ordersPriceProperty().asObject();});
+        custColOrdersPrice.setCellValueFactory((param) -> param.getValue().ordersPriceProperty().asObject());
 
         //Centering content
         PrintedAPI.centerColumns(custTv.getColumns());
         custTv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         //ORDERS COLUMNS*********************************************************
-        ordersColOrderId.setCellValueFactory((param) -> {return param.getValue().idProperty().asObject();});
-        ordersColCustomerID.setCellValueFactory((param) -> {return param.getValue().customerIdProperty().asObject();});
-        ordersColCustomer.setCellValueFactory((param) -> {return param.getValue().customerNameProperty();});
-        ordersColTotalQuantity.setCellValueFactory((param) -> {return param.getValue().quantityProperty().asObject();});
-        ordersColTotalPrice.setCellValueFactory((param) -> {return param.getValue().priceProperty().asObject();});
-        ordersColTotalCosts.setCellValueFactory((param) -> {return param.getValue().costsProperty().asObject();});
-        ordersColTotalWeight.setCellValueFactory((param) -> {return param.getValue().weightProperty().asObject();});
-        ordersColTotalSupportWeight.setCellValueFactory((param) -> {return param.getValue().supportWeightProperty().asObject();});
-        ordersColTotalBuildTimeFormatted.setCellValueFactory((param) -> {return param.getValue().buildTimeFormattedProperty();});
-        ordersColDateCreated.setCellValueFactory((param) -> {return param.getValue().dateCreatedProperty();});
-        ordersColDueDate.setCellValueFactory((param) -> {return param.getValue().dueDateProperty();});
-        ordersColStatus.setCellValueFactory((param) -> {return param.getValue().statusProperty();});
-        ordersColComment.setCellValueFactory((param) -> {return param.getValue().commentProperty();});
+        ordersColOrderId.setCellValueFactory((param) -> param.getValue().idProperty().asObject());
+        ordersColCustomerID.setCellValueFactory((param) -> param.getValue().customerIdProperty().asObject());
+        ordersColCustomer.setCellValueFactory((param) -> param.getValue().customerNameProperty());
+        ordersColTotalQuantity.setCellValueFactory((param) -> param.getValue().quantityProperty().asObject());
+        ordersColTotalPrice.setCellValueFactory((param) -> param.getValue().priceProperty().asObject());
+        ordersColTotalCosts.setCellValueFactory((param) -> param.getValue().costsProperty().asObject());
+        ordersColTotalWeight.setCellValueFactory((param) -> param.getValue().weightProperty().asObject());
+        ordersColTotalSupportWeight.setCellValueFactory((param) -> param.getValue().supportWeightProperty().asObject());
+        ordersColTotalBuildTimeFormatted.setCellValueFactory((param) -> param.getValue().buildTimeFormattedProperty());
+        ordersColDateCreated.setCellValueFactory((param) -> param.getValue().dateCreatedProperty());
+        ordersColDueDate.setCellValueFactory((param) -> param.getValue().dueDateProperty());
+        ordersColStatus.setCellValueFactory((param) -> param.getValue().statusProperty());
+        ordersColComment.setCellValueFactory((param) -> param.getValue().commentProperty());
 
         PrintedAPI.centerColumns(ordersTv.getColumns());
         ordersTv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -384,30 +522,11 @@ public class ControllerMain implements Initializable {
     //This method uses table of printers and id of printer stored in listOfCosts to get and set printer name for particular Cost object
     //We can set here labels for total costs only, not for selected, because we are looping all entries.
     //And because we cannot change UI elements from other thread tha man javaFX thread, we will do it in Platform.runLater() method.
-    private void completeListOfCosts(){
-
-        int total = listOfCosts.size(), totalQuantity = 0;
-        double shipping = 0, price = 0;
-
+    private void  completeListOfCosts(){
+        //adds missing informations
         for (Cost cost : listOfCosts) {
             cost.setPrinterName(Printer.getName(listOfPrinters, cost.getPrinterId()));
-
-            totalQuantity += cost.getQuantity();
-            shipping += cost.getShipping();
-            price += cost.getPrice();
-
         }
-
-        int finalTotalQuantity = totalQuantity;
-
-        double finalPrice = PrintedAPI.round(price);
-        double finalShipping = PrintedAPI.round(shipping);
-
-        Platform.runLater(() -> {
-            costsLabelTotal.setText("Total (" + total + ")");
-            costsLabelTotalQuantity.setText("" + finalTotalQuantity);
-            costsLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f)", finalShipping, finalPrice, finalShipping + finalPrice));
-        });
     }
 
     private void calculateSelectedCostsStatistics(ObservableList<Cost> selectedCosts){
@@ -451,12 +570,6 @@ public class ControllerMain implements Initializable {
     private void completeListOfPrinters(){
         //We can get number of sold items and incomes by searching listOfOrderItems.
         //We can get expenses by searching listOfCosts
-        //We can get overall Incomes by subtracting costs from incomes
-
-        //declaration of variables used for labels
-        int itemsPrinted = 0;
-
-        double shipping = 0, price = 0, duty = 0, tax = 0, totalPrice = 0, totalExpenses = 0, priceInclExpenses = 0, printersIncome = 0;
 
         for (Printer printer : listOfPrinters) {
 
@@ -469,7 +582,6 @@ public class ControllerMain implements Initializable {
                     printer.setItemsSold(printer.getItemsSold() + orderItem.getObject().getSoldCount());
                     incomes = printer.getIncomes() + orderItem.getObject().getSoldPrice();
                     printer.setIncomes(PrintedAPI.round(incomes));
-                    itemsPrinted += orderItem.getObject().getSoldCount();
                 }
             }
 
@@ -484,39 +596,7 @@ public class ControllerMain implements Initializable {
             overallIncome = incomes - expenses;
             printer.setOverallIncome(PrintedAPI.round(overallIncome));
             printer.setType(SimpleTableObject.getSimpleTableObjectByPropId(commonMaterialProperties, printer.getTypeID()).getPropertyName());
-
-            //calculation for "Total" labels
-            shipping += printer.getShipping();
-            price += printer.getPrice();
-            duty += printer.getDuty();
-            tax += printer.getTax();
-            totalPrice += printer.getShipping() + printer.getPrice() + printer.getDuty() + printer.getTax();
-            totalExpenses += printer.getExpenses();
-            printersIncome += printer.getIncomes();
         }
-
-        priceInclExpenses += totalPrice + totalExpenses;
-
-        double finalShipping = PrintedAPI.round(shipping);
-        double finalPrice = PrintedAPI.round(price);
-        double finalDuty = PrintedAPI.round(duty);
-        double finalTax = PrintedAPI.round(tax);
-        double finalTotalPrice = PrintedAPI.round(totalPrice);
-        double finalTotalExpenses = PrintedAPI.round(totalExpenses);
-        double finalPriceInclExpenses = PrintedAPI.round(priceInclExpenses);
-        double finalPrintersIncome = PrintedAPI.round(printersIncome);
-        int finalItemsPrinted = itemsPrinted;
-
-        Platform.runLater(() -> {
-            printersLabelTotal.setText("Total (" + listOfPrinters.size() + ")");
-            printersLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f $)", finalShipping, finalPrice, finalShipping + finalPrice));
-            printersLabelTotalDutyTaxTotal.setText(String.format("%.2f $/%.2f $ ( %.2f $)", finalDuty, finalTax, finalDuty + finalTax));
-            printersLabelTotalPriceOfPrinters.setText(finalTotalPrice + " $");
-            printersLabelTotalExpenses.setText(finalTotalExpenses + " $");
-            printersLabelTotalPriceInclExpenses.setText(finalPriceInclExpenses + " $");
-            printersLabelTotalIncomesProfit.setText(String.format("%.2f $ (%.2f $)", finalPrintersIncome, finalPrintersIncome - finalPriceInclExpenses));
-            printersLabelTotalItemsPrinted.setText(finalItemsPrinted + "");
-        });
     }
 
     private void calculateSelectedPrintersStatistics(ObservableList<Printer> selectedPrinters) {
@@ -636,12 +716,9 @@ public class ControllerMain implements Initializable {
             //setting used, remaining, trash, soldFor and profit
             for (OrderItem orderItem : listOfOrderItems) {
                 if(orderItem.getMaterial().getId() == matId){
-
                     orderItem.setMaterial(material);
-
                     used += orderItem.getObject().getWeight() + orderItem.getObject().getSupportWeight();
                     soldFor += orderItem.getObject().getSoldPrice();
-
                 }
             }
 
@@ -651,63 +728,7 @@ public class ControllerMain implements Initializable {
             material.setRemaining(PrintedAPI.round(remaining));
             material.setSoldFor(PrintedAPI.round(soldFor));
             material.setProfit(PrintedAPI.round(soldFor - material.getPrice()));
-
-            //setting label values
-            shipping += material.getShipping();
-            price += material.getPrice();
-            trash += material.getTrash();
-
-            revenue += soldFor;
-            totalWeight += material.getWeight();
-
-            if (material.isSold())soldRolls++;
-            if (!material.isSold())remainingRolls++;
-
-            soldWeight += used;
-            remainingWeight += remaining;
         }
-
-        for (SimpleTableObject obj : commonMaterialProperties){
-            int id = obj.getPropertyTypeId();
-
-            switch (id) {
-                case 1:
-                    types++;
-                    continue;
-                case 2:
-                    colors++;
-                    continue;
-                default:
-                    continue;
-            }
-        }
-
-        double finalShipping = PrintedAPI.round(shipping);
-        double finalPrice = PrintedAPI.round(price);
-        double finalRevenue = PrintedAPI.round(revenue);
-        double finalProfit = PrintedAPI.round(revenue - (finalPrice + finalShipping));
-        double finalRemainingWeight = PrintedAPI.round(remainingWeight);
-        double finalTotalWeight = PrintedAPI.round(totalWeight);
-        double finalSoldWeight = PrintedAPI.round(soldWeight);
-        double finalTrash = PrintedAPI.round(trash);
-
-        int finalTotal = listOfMaterials.size();
-        int finalRemainingRolls = remainingRolls;
-        int finalTotalRolls = finalTotal;
-        int finalSoldRolls = soldRolls;
-        int finalColors = colors, finalTypes = types;
-
-        Platform.runLater(() -> {
-           matLabelTotal.setText("Total(" + finalTotal + ")");
-           matLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f $)", finalShipping, finalPrice, finalShipping + finalPrice));
-           matLabelTotalRevenueProfit.setText(finalRevenue + " $/" + finalProfit + " $");
-           matLabelTotalWeightRolls.setText(String.format("%.2f kg/%d rolls", finalTotalWeight/1000, finalTotalRolls));
-           matLabelTotalSoldWeightRolls.setText(String.format("%.2f kg/%d rolls", finalSoldWeight/1000, finalSoldRolls));
-           matLabelTotalRemainingWeightRolls.setText(String.format("%.2f kg/%d rolls", finalRemainingWeight/1000, finalRemainingRolls));
-           matLabelTotalAvgRollBuySellPrice.setText(String.format("%.2f $/ %.2f $", finalPrice/finalTotal, finalRevenue/finalTotal));
-           matLabelTotalTrash.setText(finalTrash/1000 + " kg");
-           matLabelTotalColorsTypes.setText(finalColors + "/" + finalTypes);
-        });
     }
 
     private void calculateSelectedMaterialsStatistics(ObservableList<Material> selectedMaterials){
@@ -830,10 +851,6 @@ public class ControllerMain implements Initializable {
             object.setSoldPrice(PrintedAPI.round(soldPrice));
             object.setCosts(PrintedAPI.round(costs));
         }
-
-        Platform.runLater(() -> {
-            objLabelTotal.setText(listOfObjects.size() + "");
-        });
     }
 
     private void calculateSelectedObjectsStatistics(ObservableList<Object> selectedObjects){
@@ -897,7 +914,7 @@ public class ControllerMain implements Initializable {
         custTv.setItems(customers);
     }
 
-    //display current list of costs saved in global variable.
+    //display current list of customers
     public void displayCustomers() {
         completeListOfCustomers();
         custTv.setItems(listOfCustomers);
@@ -930,10 +947,6 @@ public class ControllerMain implements Initializable {
             customer.setOrderCount(ordersCount);
             customer.setOrdersPrice(ordersPrice);
         }
-
-        Platform.runLater(() -> {
-            custLabelTotal.setText(listOfCustomers.size() + "");
-        });
     }
 
     private void calculateSelectedCustomersStatistics(ObservableList<Customer> selectedCustomers){
@@ -1008,7 +1021,6 @@ public class ControllerMain implements Initializable {
         //declaration of variables used for labels
         double soldPrice = 0, soldCosts = 0,
                 notSoldPrice = 0, notSoldCosts = 0,
-                totalPrice = 0, totalCosts = 0,
                 pricePerHour = 0, weight = 0, supportWeight = 0;
 
         int buildTime = 0, itemsPrinted = listOfOrderItems.size(), total = listOfOrders.size(), sold = 0, notSold = 0;
@@ -1072,52 +1084,7 @@ public class ControllerMain implements Initializable {
             }
 
             order.setCustomerName(custName);
-
-            //start of common statistics calculation
-            buildTime += order.getBuildTime();
-            weight += order.getWeight();
-            supportWeight += order.getSupportWeight();
-            itemsPrinted += order.getQuantity();
-
-            if (order.getStatus().equals("Sold")) {
-                soldPrice += order.getPrice();
-                soldCosts += order.getCosts();
-                sold++;
-            } else if (order.getStatus().equals("Not Sold")) {
-                notSoldPrice += order.getPrice();
-                notSoldCosts += order.getCosts();
-                notSold++;
-            }
         }
-
-        pricePerHour = (soldPrice + notSoldPrice)/buildTime*60;
-
-        double finalSoldCosts = soldCosts;
-        double finalSoldPrice = soldPrice;
-        double finalNotSoldPrice = notSoldPrice;
-        double finalNotSoldCosts = notSoldCosts;
-        double finalPricePerHour = pricePerHour;
-        double finalSupportWeight = supportWeight;
-        double finalWeight = weight;
-
-        String finalBuildTime = PrintedAPI.formatTime(buildTime).get();
-
-        int finalItemsPrinted = itemsPrinted;
-        int finalSold = sold;
-        int finalNotSold = notSold;
-
-        Platform.runLater(() -> {
-            ordersLabelNotSold.setText("Not Sold (" + finalNotSold + ")");
-            ordersLabelSold.setText("Not Sold (" + finalSold + ")");
-            ordersLabelTotal.setText("Total(" + total + ")");
-            ordersLabelSoldPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", finalSoldPrice, finalSoldCosts, finalSoldPrice - finalSoldCosts));
-            ordersLabelNotSoldPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", finalNotSoldPrice, finalNotSoldCosts, finalNotSoldPrice - finalNotSoldCosts));
-            ordersLabelTotalPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", finalSoldPrice + finalNotSoldPrice, finalSoldCosts + finalNotSoldCosts, (finalSoldPrice + finalNotSoldPrice) - (finalSoldCosts + finalNotSoldCosts)));
-            ordersLabelTotalPerHour.setText(String.format("%.2f $/h", finalPricePerHour));
-            ordersLabelTotalWeightSupports.setText(String.format("%.2f kg/%.2f kg", finalWeight/1000, finalSupportWeight/1000));
-            ordersLabelTotalBuildTime.setText(finalBuildTime);
-            ordersLabelTotalItemsPrinted.setText(finalItemsPrinted + "");
-        });
     }
 
     private void calculateSelectedOrdersStatistics(ObservableList<Order> selectedOrders){
@@ -1179,74 +1146,110 @@ public class ControllerMain implements Initializable {
                 @Override
                 protected ObservableList<Cost> call() throws Exception {
                     try {
-                        int i = -1, max = 12;
+                        int i = -1, max = 19;
 
                         progressBar.setVisible(true);
 
-                        updateProgress(i, 6);
-                        updateMessage("Downloading has just started, my " + userTitle);
+                        updateProgress(i, max);
+                        updateMessage("Downloading has just started.");
 
-                        updateMessage("Downloading Costs table, my " + userTitle);
+                        updateMessage("Downloading Costs table.");
                         listOfCosts = Cost.downloadCostsTable(ds);
                         updateProgress(i+2, max);
-                        updateMessage("Done downloading Costs table, my " + userTitle);
+                        updateMessage("Done downloading Costs table.");
 
-                        updateMessage("Downloading Printers table, my " + userTitle);
+                        updateMessage("Downloading Printers table.");
                         listOfPrinters = Printer.downloadPrintersTable(ds);
-                        updateProgress(i++, max);
-                        updateMessage("Done downloading Printers table, my " + userTitle);
+                        updateProgress(++i, max);
+                        updateMessage("Done downloading Printers table.");
 
-                        updateMessage("Downloading Materials table, my " + userTitle);
+                        updateMessage("Downloading Materials table.");
                         listOfMaterials = Material.downloadMaterialsTable(ds);
-                        updateProgress(i++, max);
-                        updateMessage("Done downloading Materials table, my " + userTitle);
+                        updateProgress(++i, max);
+                        updateMessage("Done downloading Materials table.");
 
-                        updateMessage("Downloading Objects table, my " + userTitle);
+                        updateMessage("Downloading Objects table.");
                         listOfObjects = Object.downloadObjectsTable(ds);
-                        updateProgress(i++, max);
-                        updateMessage("Done downloading Objects table, my " + userTitle);
+                        updateProgress(++i, max);
+                        updateMessage("Done downloading Objects table.");
 
-                        updateMessage("Downloading Customers table, my " + userTitle);
+                        updateMessage("Downloading Customers table.");
                         listOfCustomers = Customer.downloadCustomersTable(ds);
-                        updateProgress(i++, max);
-                        updateMessage("Done downloading Customers table, my " + userTitle);
+                        updateProgress(++i, max);
+                        updateMessage("Done downloading Customers table.");
 
-                        updateMessage("Downloading Orders table, my " + userTitle);
+                        updateMessage("Downloading Orders table.");
                         listOfOrders = Order.downloadOrdersTable(ds);
-                        updateProgress(i++, max);
-                        updateMessage("Done downloading Orders table, my " + userTitle);
+                        updateProgress(++i, max);
+                        updateMessage("Done downloading Orders table.");
 
-                        updateMessage("Downloading Order Items table, my " + userTitle);
+                        updateMessage("Downloading Order Items table.");
                         listOfOrderItems = OrderItem.downloadOrderItemsTable(ds);
-                        updateProgress(i++, max);
-                        updateMessage("Done downloading Order Items table, my " + userTitle);
+                        updateProgress(++i, max);
+                        updateMessage("Done downloading Order Items table.");
 
-                        updateMessage("Downloading additional tables, my " + userTitle);
+                        updateMessage("Downloading additional tables.");
+
+                        updateMessage("Downloading Customer properties table.");
                         commonCustomerProperties = SimpleTableObject.downloadCommonCustomerProperties(ds);
-                        updateProgress(i++, max);
-                        commonMaterialProperties = SimpleTableObject.downloadCommonMaterialProperties(ds);
-                        updateProgress(i++, max);
+                        updateMessage("Done downloading Customer properties table.");
+                        updateProgress(++i, max);
+
+                        updateMessage("Downloading Material properties table.");
+                        commonMaterialProperties = SimpleTableObject.downloadCommonMaterialProperties(ds);                        
+                        updateProgress(++i, max);
+                        updateMessage("Done downloading Customer properties table.");
+
+                        updateMessage("Done downloading Customer property types table.");
                         commonCustomerPropertyTypes = SimpleTableObject.downloadCustomerPropertyTypes(ds);
-                        updateProgress(i++, max);
+                        updateMessage("Done downloading Customer property types table.");                        
+                        updateProgress(++i, max);
+
+                        updateMessage("Downloading Material property types table.");
                         commonMaterialPropertyTypes = SimpleTableObject.downloadMaterialPropertyTypes(ds);
-                        updateProgress(i++, max);
+                        updateMessage("Done downloading Material property types table.");
+                        updateProgress(++i, max);
+
+                        updateMessage("Downloading Order statuses table.");
                         commonOrderStatus = SimpleTableObject.downloadOrderStatusTable();
-                        updateProgress(i++, max);
-                        updateMessage("Done downloading additional tables, my " + userTitle);
-
-
-                        updateMessage("All tables were successfully downloaded, my " + userTitle);
-                        updateMessage("Now calculating content, my " + userTitle);
+                        updateMessage("Done downloading Order statuses table.");
+                        updateProgress(++i, max);
+                        
+                        updateMessage("Done downloading additional tables.");
+                        updateMessage("All tables were successfully downloaded.");
+                        updateMessage("Now completing content...");
 
                         displayCosts();
-                        displayPrinters();
-                        displayMaterials();
-                        displayObjects();
-                        displayCustomers();
-                        displayOrders();
-                        updateMessage("All done.");
-                        updateProgress(max, max);
+                        updateMessage("Costs completed.");
+                        updateProgress(++i, max);
 
+                        displayPrinters();
+                        updateMessage("Printers completed.");
+                        updateProgress(++i, max);
+
+                        displayMaterials();
+                        updateMessage("Materials completed.");
+                        updateProgress(++i, max);
+
+                        displayObjects();
+                        updateMessage("Objects completed.");
+                        updateProgress(++i, max);
+
+                        displayCustomers();
+                        updateMessage("Customers completed.");
+                        updateProgress(++i, max);
+
+                        displayOrders();
+                        updateMessage("Orders completed.");
+                        updateProgress(++i, max);
+
+                        updateMessage("Now calculating content.");
+                        Platform.runLater(() -> calculateAllStatistics());
+                        updateProgress(++i, max);
+
+                        updateProgress(max, max);
+                        updateMessage("All done.");
+                        
                         progressBar.setVisible(false);
 
                     } catch (NullPointerException e) {
@@ -1267,15 +1270,15 @@ public class ControllerMain implements Initializable {
         calculateSelectedCostsStatistics(costsTv.getSelectionModel().getSelectedItems());
     });
 
-        costsTv.setRowFactory( tv -> {
-            TableRow<Cost> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    costsBtnEdit.fire();
-                }
-            });
-            return row;
+    costsTv.setRowFactory( tv -> {
+        TableRow<Cost> row = new TableRow<>();
+        row.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                costsBtnEdit.fire();
+            }
         });
+        return row;
+    });
 
     costsBtnCreate.setOnAction((event) -> {
         try{
@@ -1351,6 +1354,10 @@ public class ControllerMain implements Initializable {
         }
     });
 
+    costsBtnDelete.setOnAction(event -> Cost.deleteCosts(costsTv.getSelectionModel().getSelectedItems(), ds));
+
+    costsBtnRefresh.setOnAction(event -> PrintedAPI.serviceStart(serviceDownloadAllTables));
+
     /*****************************          INITIALIZE PRINTERS TAB          *****************************/
     printersTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Printer> c) -> {
         calculateSelectedPrintersStatistics(printersTv.getSelectionModel().getSelectedItems());
@@ -1400,20 +1407,20 @@ public class ControllerMain implements Initializable {
         }
     });
 
-        printersBtnEdit.setOnAction(event -> {
-            try{
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/edit/ViewEditPrinter.fxml"));
-                Parent root1 = fxmlLoader.load();
-                ControllerEditPrinter ctrl = fxmlLoader.getController();
-                Stage stage = new Stage();
-                stage.initModality(Modality.APPLICATION_MODAL);
-                stage.setTitle("New Printer");
+    printersBtnEdit.setOnAction(event -> {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/edit/ViewEditPrinter.fxml"));
+            Parent root1 = fxmlLoader.load();
+            ControllerEditPrinter ctrl = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("New Printer");
 
-                stage.setScene(new Scene(root1));
-                stage.setResizable(false);
-                stage.centerOnScreen();
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.centerOnScreen();
 
-                stage.getScene().setOnKeyPressed(event1 -> {
+            stage.getScene().setOnKeyPressed(event1 -> {
                     switch (event1.getCode()) {
                         case ENTER:
                             ctrl.getBtnCreate().fire();
@@ -1423,17 +1430,19 @@ public class ControllerMain implements Initializable {
                     }
                 });
 
-                //passing credentials to main controller
-                ctrl.setDs(ds);
-                ctrl.setControllerMain(this);
-                ctrl.setFieldsValues(printersTv.getSelectionModel().getSelectedItems().get(0));
-                stage.show();
-
-            }catch (IOException e){
+            //passing credentials to main controller
+            ctrl.setDs(ds);
+            ctrl.setControllerMain(this);
+            ctrl.setFieldsValues(printersTv.getSelectionModel().getSelectedItems().get(0));
+            stage.show();
+        }catch (IOException e){
                 e.printStackTrace();
             }
-        });
+    });
 
+    printersBtnDelete.setOnAction(event -> Printer.deletePrinters(printersTv.getSelectionModel().getSelectedItems(), ds));
+
+    printersBtnRefresh.setOnAction(event -> PrintedAPI.serviceStart(serviceDownloadAllTables));
 
     /*****************************          INITIALIZE MATERIALS TAB          *****************************/
     matTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Material> c) -> {
@@ -1486,22 +1495,22 @@ public class ControllerMain implements Initializable {
             }
         });
 
-        matBtnEdit.setOnAction((event) -> {
-            try{
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/edit/ViewEditMaterial.fxml"));
-                Parent root1 = fxmlLoader.load();
-                ControllerEditMaterial ctrl = fxmlLoader.getController();
-                Stage stage = new Stage();
-                stage.initModality(Modality.APPLICATION_MODAL);
-                stage.setTitle("Edit Material");
-                stage.setMinHeight(440);
-                stage.setMinWidth(400);
+    matBtnEdit.setOnAction((event) -> {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/resources/view/edit/ViewEditMaterial.fxml"));
+            Parent root1 = fxmlLoader.load();
+            ControllerEditMaterial ctrl = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Edit Material");
+            stage.setMinHeight(440);
+            stage.setMinWidth(400);
 
-                stage.setScene(new Scene(root1));
-                stage.setResizable(false);
-                stage.centerOnScreen();
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.centerOnScreen();
 
-                stage.getScene().setOnKeyPressed(event1 -> {
+            stage.getScene().setOnKeyPressed(event1 -> {
                     switch (event1.getCode()) {
                         case ENTER:
                             ctrl.getBtnCreate().fire();
@@ -1511,16 +1520,17 @@ public class ControllerMain implements Initializable {
                     }
                 });
 
-                //passing credentials to main controller
-                ctrl.setDs(ds);
-                ctrl.setControllerMain(this);
-                ctrl.setFieldsValues(matTv.getSelectionModel().getSelectedItems().get(0));
-                stage.show();
+            //passing credentials to main controller
+            ctrl.setDs(ds);
+            ctrl.setControllerMain(this);
+            ctrl.setFieldsValues(matTv.getSelectionModel().getSelectedItems().get(0));
+            stage.show();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    });
 
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-        });
+    matBtnRefresh.setOnAction(event -> PrintedAPI.serviceStart(serviceDownloadAllTables));
 
     /*****************************          INITIALIZE OBJECTS TAB          *****************************/
     objTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Object> c) -> {
@@ -1608,6 +1618,8 @@ public class ControllerMain implements Initializable {
             e.printStackTrace();
         }
     });
+
+    objBtnRefresh.setOnAction(event -> PrintedAPI.serviceStart(serviceDownloadAllTables));
     /*****************************          INITIALIZE CUSTOMERS TAB          *****************************/
     custTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Customer> c) -> {
         calculateSelectedCustomersStatistics(custTv.getSelectionModel().getSelectedItems());
@@ -1696,6 +1708,8 @@ public class ControllerMain implements Initializable {
         }
     });
 
+    custBtnRefresh.setOnAction(event -> PrintedAPI.serviceStart(serviceDownloadAllTables));
+
     /*****************************          INITIALIZE ORDERS TAB          *****************************/
     ordersTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Order> c) -> {
         calculateSelectedOrdersStatistics(ordersTv.getSelectionModel().getSelectedItems());
@@ -1778,6 +1792,8 @@ public class ControllerMain implements Initializable {
             e.printStackTrace();
         }
     });
+
+    ordersBtnRefresh.setOnAction(event -> PrintedAPI.serviceStart(serviceDownloadAllTables));
 
     }//end of initialize();
 

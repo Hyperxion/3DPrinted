@@ -177,6 +177,57 @@ public class Customer {
         }//end try         
     }
 
+    public static void deleteCustomers(ObservableList<Customer> customers, HikariDataSource ds){
+        //Create query
+        String updateQuery;
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+
+            //STEP 2: Register JDBC driver
+            Class.forName("org.mariadb.jdbc.Driver");
+
+            //STEP 3: Open a connection
+
+            conn = ds.getConnection();
+            //STEP 4: Execute a query
+
+            for (Customer customer : customers){
+                updateQuery = "DELETE FROM Customers WHERE CustomerID =  " + customer.getId();
+                stmt = conn.prepareStatement(updateQuery);
+                stmt.executeUpdate();
+            }
+
+
+            stmt.close();
+            conn.close();
+        } catch (SQLNonTransientConnectionException se) {
+            se.printStackTrace();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null)
+                    conn.close();
+            } catch (SQLException se) {
+            }// do nothing
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        }//end try
+
+    }
+
     public Customer(SimpleStringProperty lastName, SimpleStringProperty firstName, SimpleStringProperty dateCreated, SimpleStringProperty mail, SimpleStringProperty phone, SimpleStringProperty address, SimpleStringProperty city, SimpleStringProperty zipCode, SimpleStringProperty comment, SimpleIntegerProperty id, SimpleIntegerProperty companyId, SimpleIntegerProperty countryId) {
         this.lastName = lastName;
         this.firstName = firstName;
