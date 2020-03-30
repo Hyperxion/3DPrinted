@@ -171,7 +171,7 @@ public class Printer {
         }//end try
     }
 
-    safe delete
+    //safe delete
     public static void deletePrinters(ObservableList<Printer> printers, HikariDataSource ds) {
         //Create query
         String updateQuery;
@@ -199,7 +199,7 @@ public class Printer {
             conn.close();
 
         } catch (SQLIntegrityConstraintViolationException e) {
-            open window with warning
+            //open window with warning
         } catch (SQLNonTransientConnectionException se) {
             se.printStackTrace();
         } catch (SQLException se) {

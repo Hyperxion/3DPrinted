@@ -7,6 +7,8 @@ import controller.create.*;
 import controller.create.ControllerCreateOrder;
 import controller.edit.*;
 import javafx.application.Platform;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -68,11 +70,11 @@ public class ControllerMain implements Initializable {
     private HikariDataSource ds;
     private Service serviceDownloadAllTables;
 
-    private ObservableList<SimpleTableObject> commonCustomerProperties;
-    private ObservableList<SimpleTableObject> commonMaterialProperties;
-    private ObservableList<SimpleTableObject> commonCustomerPropertyTypes;
-    private ObservableList<SimpleTableObject> commonMaterialPropertyTypes;
-    private ObservableList<SimpleTableObject> commonOrderStatus;
+    private ObservableList<SimpleTableObject> commonCustomerProperties = FXCollections.observableArrayList();
+    private ObservableList<SimpleTableObject> commonMaterialProperties = FXCollections.observableArrayList();
+    private ObservableList<SimpleTableObject> commonCustomerPropertyTypes = FXCollections.observableArrayList();
+    private ObservableList<SimpleTableObject> commonMaterialPropertyTypes = FXCollections.observableArrayList();
+    private ObservableList<SimpleTableObject> commonOrderStatus = FXCollections.observableArrayList();
 
     @FXML
     private ProgressBar progressBar;
@@ -82,6 +84,7 @@ public class ControllerMain implements Initializable {
 
     /*****************************          COSTS VARIABLES       *****************************/
     private ObservableList<Cost> listOfCosts = FXCollections.observableArrayList();
+    private ListProperty<Cost> listOfCostsProperty = new SimpleListProperty<>(listOfCosts);
 
     @FXML
     private Tab costsTab;
@@ -1266,9 +1269,16 @@ public class ControllerMain implements Initializable {
 
 
     /*****************************          INITIALIZE COSTS TAB          *****************************/
-    costsTv.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Cost> c) -> {
-        calculateSelectedCostsStatistics(costsTv.getSelectionModel().getSelectedItems());
+    costsTv.itemsProperty().bindBidirectional(listOfCostsProperty);
+
+    listOfCostsProperty.addListener((observable, oldList, newList) -> {
+        System.out.println("Changed");
+        calculateAllStatistics();
     });
+
+//    listOfCosts.addListener((ListChangeListener<Cost>) c -> {
+//        System.out.println("list changed");
+//    });
 
     costsTv.setRowFactory( tv -> {
         TableRow<Cost> row = new TableRow<>();
@@ -1354,7 +1364,10 @@ public class ControllerMain implements Initializable {
         }
     });
 
-    costsBtnDelete.setOnAction(event -> Cost.deleteCosts(costsTv.getSelectionModel().getSelectedItems(), ds));
+    costsBtnDelete.setOnAction(event -> {
+        Cost.deleteCosts(costsTv.getSelectionModel().getSelectedItems(), ds);
+        costsTv.refresh();
+    });
 
     costsBtnRefresh.setOnAction(event -> PrintedAPI.serviceStart(serviceDownloadAllTables));
 
