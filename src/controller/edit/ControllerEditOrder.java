@@ -117,6 +117,7 @@ public class ControllerEditOrder implements Initializable {
                 OrderItem.insertUpdateOrderItem(editedOrderItems, ds, PrintedAPI.getCurrentAutoIncrementValue(ds, "OrderItems"));
                 PrintedAPI.closeWindow(btnCreate);
                 controllerMain.getOrdersTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

@@ -47,6 +47,7 @@ public class ControllerEditMaterial implements Initializable {
                 Material.insertUpdateMaterial(editedMaterial, ds);
                 PrintedAPI.closeWindow(btnCreate);
                 controllerMain.getMatTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

@@ -42,6 +42,7 @@ public class ControllerEditObject implements Initializable {
                 Object.insertUpdateObject(editedObject, ds);
                 PrintedAPI.closeWindow(btnCreate);
                 controllerMain.getObjTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

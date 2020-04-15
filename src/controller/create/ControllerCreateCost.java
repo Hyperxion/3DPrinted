@@ -54,6 +54,7 @@ public class ControllerCreateCost implements Initializable {
                 //PrintedAPI.serviceStart(controllerMain.getServiceDownloadAllTables());
                 controllerMain.getListOfCosts().add(0, newCost);
                 controllerMain.getCostsTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

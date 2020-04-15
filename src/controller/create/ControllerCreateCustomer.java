@@ -51,6 +51,7 @@ public class ControllerCreateCustomer implements Initializable {
                 PrintedAPI.closeWindow(btnCreate);
                 controllerMain.getListOfCustomers().add(0, newCust);
                 controllerMain.getCustTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

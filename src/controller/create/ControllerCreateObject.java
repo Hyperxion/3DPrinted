@@ -40,6 +40,7 @@ public class ControllerCreateObject implements Initializable {
                 PrintedAPI.closeWindow(btnCreate);
                 controllerMain.getListOfObjects().add(0, newObject);
                 controllerMain.getObjTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

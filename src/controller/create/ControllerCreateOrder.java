@@ -118,6 +118,7 @@ public class ControllerCreateOrder implements Initializable {
                 PrintedAPI.closeWindow(btnCreate);
                 controllerMain.getListOfOrders().add(0, newOrder);
                 controllerMain.getOrdersTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

@@ -172,7 +172,7 @@ public class Printer {
     }
 
     //safe delete
-    public static void deletePrinters(ObservableList<Printer> printers, HikariDataSource ds) {
+    public static void safeDeletePrinters(ObservableList<Printer> printers, HikariDataSource ds) {
         //Create query
         String updateQuery;
 
@@ -188,6 +188,18 @@ public class Printer {
 
             conn = ds.getConnection();
             //STEP 4: Execute a query
+
+            for (Printer printer : printers) {
+                updateQuery = "DELETE FROM Costs WHERE PrinterID =  " + printer.getId();
+                stmt = conn.prepareStatement(updateQuery);
+                stmt.executeUpdate();
+            }
+
+            for (Printer printer : printers) {
+                updateQuery = "DELETE FROM OrderItems WHERE PrinterID =  " + printer.getId();
+                stmt = conn.prepareStatement(updateQuery);
+                stmt.executeUpdate();
+            }
 
             for (Printer printer : printers) {
                 updateQuery = "DELETE FROM Printers WHERE PrinterID =  " + printer.getId();

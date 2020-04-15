@@ -51,6 +51,7 @@ public class ControllerCreateMaterial implements Initializable {
                 PrintedAPI.closeWindow(btnCreate);
                 controllerMain.getListOfMaterials().add(0, newMaterial);
                 controllerMain.getMatTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

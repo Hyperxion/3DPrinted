@@ -51,6 +51,7 @@ public class ControllerEditCost implements Initializable {
                 //PrintedAPI.serviceStart(controllerMain.getServiceDownloadAllTables());
                 //controllerMain.getListOfCosts().add(0, editedCost);
                 controllerMain.getCostsTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

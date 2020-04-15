@@ -51,6 +51,7 @@ public class ControllerCreatePrinter implements Initializable {
                 PrintedAPI.closeWindow(btnCreate);
                 controllerMain.getListOfPrinters().add(0, newPrinter);
                 controllerMain.getPrintersTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

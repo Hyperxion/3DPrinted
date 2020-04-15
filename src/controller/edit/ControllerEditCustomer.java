@@ -47,6 +47,7 @@ public class ControllerEditCustomer implements Initializable {
                 Customer.insertUpdateCust(editedCust, ds);
                 PrintedAPI.closeWindow(btnCreate);
                 controllerMain.getCustTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

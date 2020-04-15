@@ -50,6 +50,7 @@ public class ControllerEditPrinter implements Initializable {
                 Printer.insertUpdatePrinter(editedPrinter, ds);
                 PrintedAPI.closeWindow(btnCreate);
                 controllerMain.getPrintersTv().refresh();
+                controllerMain.calculateAllStatistics();
             }
         });
 

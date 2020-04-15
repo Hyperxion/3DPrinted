@@ -7,8 +7,6 @@ import controller.create.*;
 import controller.create.ControllerCreateOrder;
 import controller.edit.*;
 import javafx.application.Platform;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -84,7 +82,6 @@ public class ControllerMain implements Initializable {
 
     /*****************************          COSTS VARIABLES       *****************************/
     private ObservableList<Cost> listOfCosts = FXCollections.observableArrayList();
-    private ListProperty<Cost> listOfCostsProperty = new SimpleListProperty<>(listOfCosts);
 
     @FXML
     private Tab costsTab;
@@ -243,144 +240,146 @@ public class ControllerMain implements Initializable {
     /*****************************          GENERAL METHODS       *****************************/
     //calculate statistic for all tables included Statistics tab
     public void calculateAllStatistics(){
+        Platform.runLater(() -> {
+            int quantity = 0, itemsPrinted, remainingRolls, soldRolls, colors, types, buildTime, total, sold, notSold;
+            double price = 0, shipping = 0, duty, tax, totalExpenses, priceInclExpenses, printersIncome, totalPrice,
+                    weight, trash, revenue, soldWeight, remainingWeight, totalWeight, profit,
+                    soldPrice, soldCosts, notSoldPrice, notSoldCosts, pricePerHour, supportWeight;
 
-        int quantity = 0, itemsPrinted, remainingRolls, soldRolls, colors, types, buildTime, total, sold, notSold;
-        double price = 0, shipping = 0, duty, tax, totalExpenses, priceInclExpenses, printersIncome, totalPrice,
-               weight, trash, revenue, soldWeight, remainingWeight, totalWeight, profit,
-               soldPrice, soldCosts, notSoldPrice, notSoldCosts, totalCosts = 0, pricePerHour, supportWeight;
-       
-        //calculate Costs statistics
-        if(!listOfCosts.isEmpty()){
-            for (Cost cost : listOfCosts) {
-                quantity += cost.getQuantity();
-                price += cost.getPrice();
-                shipping += cost.getShipping();
-            }
-
-            costsLabelTotal.setText("Total (" + listOfCosts.size() + ")");
-            costsLabelTotalQuantity.setText("" + quantity);
-            costsLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f)", shipping, price, shipping + price));
-        }
-
-        //calculate Printers statistics
-        if(!listOfPrinters.isEmpty()){
-            itemsPrinted = 0;
-            price = 0; shipping = 0; duty = 0; tax = 0; totalExpenses = 0; priceInclExpenses = 0; printersIncome = 0; totalPrice = 0;
-
-            for (Printer printer : listOfPrinters){
-                shipping += printer.getShipping();
-                price += printer.getPrice();
-                duty += printer.getDuty();
-                tax += printer.getTax();
-                totalPrice += printer.getShipping() + printer.getPrice() + printer.getDuty() + printer.getTax();
-                totalExpenses += printer.getExpenses();
-                printersIncome += printer.getIncomes();
-            }
-
-            priceInclExpenses += totalPrice + totalExpenses;
-
-            printersLabelTotal.setText("Total (" + listOfPrinters.size() + ")");
-            printersLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f $)", shipping, price, shipping + price));
-            printersLabelTotalDutyTaxTotal.setText(String.format("%.2f $/%.2f $ ( %.2f $)", duty, tax, duty + tax));
-            printersLabelTotalPriceOfPrinters.setText(totalPrice + " $");
-            printersLabelTotalExpenses.setText(totalExpenses + " $");
-            printersLabelTotalPriceInclExpenses.setText(priceInclExpenses + " $");
-            printersLabelTotalIncomesProfit.setText(String.format("%.2f $ (%.2f $)", printersIncome, printersIncome - priceInclExpenses));
-            printersLabelTotalItemsPrinted.setText(itemsPrinted + "");
-        }
-
-        //calculating Materials statistics
-        if(!listOfMaterials.isEmpty()){
-            colors = 0; types = 0; soldRolls = 0; remainingRolls = 0;
-            shipping = 0; price = 0; revenue = 0; totalWeight = 0; soldWeight = 0; remainingWeight = 0;
-            trash = 0; profit = 0;
-
-            for (Material material : listOfMaterials){
-                //setting label values
-                shipping += material.getShipping();
-                price += material.getPrice();
-                trash += material.getTrash();
-
-                revenue += material.getSoldFor();
-                profit += material.getProfit();
-                totalWeight += material.getWeight();
-
-                if (material.isSold())soldRolls++;
-                if (!material.isSold())remainingRolls++;
-
-                soldWeight += material.getUsed();
-                remainingWeight += material.getRemaining();
-            }
-
-            for (SimpleTableObject obj : commonMaterialProperties){
-                int id = obj.getPropertyTypeId();
-
-                switch (id) {
-                    case 1:
-                        types++;
-                        continue;
-                    case 2:
-                        colors++;
-                        continue;
-                    default:
-                        
+            //calculate Costs statistics
+            if(!listOfCosts.isEmpty()){
+                for (Cost cost : listOfCosts) {
+                    quantity += cost.getQuantity();
+                    price += cost.getPrice();
+                    shipping += cost.getShipping();
                 }
+
+                costsLabelTotal.setText("Total (" + listOfCosts.size() + ")");
+                costsLabelTotalQuantity.setText("" + quantity);
+                costsLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f)", shipping, price, shipping + price));
             }
 
-            matLabelTotal.setText("Total(" + listOfMaterials.size() + ")");
-            matLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f $)", shipping, price, shipping + price));
-            matLabelTotalRevenueProfit.setText(revenue + " $/" + profit + " $");
-            matLabelTotalWeightRolls.setText(String.format("%.2f kg/%d rolls", totalWeight/1000, soldRolls + remainingRolls));
-            matLabelTotalSoldWeightRolls.setText(String.format("%.2f kg/%d rolls", soldWeight/1000, soldRolls));
-            matLabelTotalRemainingWeightRolls.setText(String.format("%.2f kg/%d rolls", remainingWeight/1000, remainingRolls));
-            matLabelTotalAvgRollBuySellPrice.setText(String.format("%.2f $/ %.2f $", price/listOfMaterials.size(), revenue/listOfMaterials.size()));
-            matLabelTotalTrash.setText(trash/1000 + " kg");
-            matLabelTotalColorsTypes.setText(colors + "/" + types);
-        }
+            //calculate Printers statistics
+            if(!listOfPrinters.isEmpty()){
+                itemsPrinted = 0;
+                price = 0; shipping = 0; duty = 0; tax = 0; totalExpenses = 0; priceInclExpenses = 0; printersIncome = 0; totalPrice = 0;
 
-        //calculating objects statistics
-        objLabelTotal.setText(listOfObjects.size() + "");
-
-        //calculating customer statistics
-        custLabelTotal.setText(listOfObjects.size() + "");
-        
-        //calculating orders statistics
-        if(!listOfOrders.isEmpty() || !listOfOrderItems.isEmpty()){
-            //declaration of variables used for labels
-            soldPrice = 0; soldCosts = 0; notSoldPrice = 0; notSoldCosts = 0; weight = 0; supportWeight = 0;
-            buildTime = 0; itemsPrinted = listOfOrderItems.size(); total = listOfOrders.size(); sold = 0; notSold = 0;
-            
-            for (Order order : listOfOrders) {
-                //start of common statistics calculation
-                buildTime += order.getBuildTime();
-                weight += order.getWeight();
-                supportWeight += order.getSupportWeight();
-                itemsPrinted += order.getQuantity();
-
-                if (order.getStatus().equals("Sold")) {
-                    soldPrice += order.getPrice();
-                    soldCosts += order.getCosts();
-                    sold++;
-                } else if (order.getStatus().equals("Not Sold")) {
-                    notSoldPrice += order.getPrice();
-                    notSoldCosts += order.getCosts();
-                    notSold++;
+                for (Printer printer : listOfPrinters){
+                    shipping += printer.getShipping();
+                    price += printer.getPrice();
+                    duty += printer.getDuty();
+                    tax += printer.getTax();
+                    totalPrice += printer.getShipping() + printer.getPrice() + printer.getDuty() + printer.getTax();
+                    totalExpenses += printer.getExpenses();
+                    printersIncome += printer.getIncomes();
                 }
+
+                priceInclExpenses += totalPrice + totalExpenses;
+
+                printersLabelTotal.setText("Total (" + listOfPrinters.size() + ")");
+                printersLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f $)", shipping, price, shipping + price));
+                printersLabelTotalDutyTaxTotal.setText(String.format("%.2f $/%.2f $ ( %.2f $)", duty, tax, duty + tax));
+                printersLabelTotalPriceOfPrinters.setText(totalPrice + " $");
+                printersLabelTotalExpenses.setText(totalExpenses + " $");
+                printersLabelTotalPriceInclExpenses.setText(priceInclExpenses + " $");
+                printersLabelTotalIncomesProfit.setText(String.format("%.2f $ (%.2f $)", printersIncome, printersIncome - priceInclExpenses));
+                printersLabelTotalItemsPrinted.setText(itemsPrinted + "");
             }
-            
-            pricePerHour = (soldPrice + notSoldPrice)/buildTime*60;
-           
-            ordersLabelNotSold.setText("Not Sold (" + notSold + ")");
-            ordersLabelSold.setText("Not Sold (" + sold + ")");
-            ordersLabelTotal.setText("Total(" + total + ")");
-            ordersLabelSoldPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", soldPrice, soldCosts, soldPrice - soldCosts));
-            ordersLabelNotSoldPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", notSoldPrice, notSoldCosts, notSoldPrice - notSoldCosts));
-            ordersLabelTotalPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", soldPrice + notSoldPrice, soldCosts + notSoldCosts, (soldPrice + notSoldPrice) - (soldCosts + notSoldCosts)));
-            ordersLabelTotalPerHour.setText(String.format("%.2f $/h", pricePerHour));
-            ordersLabelTotalWeightSupports.setText(String.format("%.2f kg/%.2f kg", weight/1000, supportWeight/1000));
-            ordersLabelTotalBuildTime.setText(buildTime + "");
-            ordersLabelTotalItemsPrinted.setText(itemsPrinted + "");
-        }
+
+            //calculating Materials statistics
+            if(!listOfMaterials.isEmpty()){
+                colors = 0; types = 0; soldRolls = 0; remainingRolls = 0;
+                shipping = 0; price = 0; revenue = 0; totalWeight = 0; soldWeight = 0; remainingWeight = 0;
+                trash = 0; profit = 0;
+
+                for (Material material : listOfMaterials){
+                    //setting label values
+                    shipping += material.getShipping();
+                    price += material.getPrice();
+                    trash += material.getTrash();
+
+                    revenue += material.getSoldFor();
+                    profit += material.getProfit();
+                    totalWeight += material.getWeight();
+
+                    if (material.isSold())soldRolls++;
+                    if (!material.isSold())remainingRolls++;
+
+                    soldWeight += material.getUsed();
+                    remainingWeight += material.getRemaining();
+                }
+
+                for (SimpleTableObject obj : commonMaterialProperties){
+                    int id = obj.getPropertyTypeId();
+
+                    switch (id) {
+                        case 1:
+                            types++;
+                            continue;
+                        case 2:
+                            colors++;
+                            continue;
+                        default:
+
+                    }
+                }
+
+                matLabelTotal.setText("Total(" + listOfMaterials.size() + ")");
+                matLabelTotalShippingPriceTotal.setText(String.format("%.2f $/%.2f $ (%.2f $)", shipping, price, shipping + price));
+                matLabelTotalRevenueProfit.setText(revenue + " $/" + profit + " $");
+                matLabelTotalWeightRolls.setText(String.format("%.2f kg/%d rolls", totalWeight/1000, soldRolls + remainingRolls));
+                matLabelTotalSoldWeightRolls.setText(String.format("%.2f kg/%d rolls", soldWeight/1000, soldRolls));
+                matLabelTotalRemainingWeightRolls.setText(String.format("%.2f kg/%d rolls", remainingWeight/1000, remainingRolls));
+                matLabelTotalAvgRollBuySellPrice.setText(String.format("%.2f $/ %.2f $", price/listOfMaterials.size(), revenue/listOfMaterials.size()));
+                matLabelTotalTrash.setText(trash/1000 + " kg");
+                matLabelTotalColorsTypes.setText(colors + "/" + types);
+            }
+
+            //calculating objects statistics
+            objLabelTotal.setText(listOfObjects.size() + "");
+
+            //calculating customer statistics
+            custLabelTotal.setText(listOfObjects.size() + "");
+
+            //calculating orders statistics
+            if(!listOfOrders.isEmpty() || !listOfOrderItems.isEmpty()){
+                //declaration of variables used for labels
+                soldPrice = 0; soldCosts = 0; notSoldPrice = 0; notSoldCosts = 0; weight = 0; supportWeight = 0;
+                buildTime = 0; itemsPrinted = listOfOrderItems.size(); total = listOfOrders.size(); sold = 0; notSold = 0;
+
+                for (Order order : listOfOrders) {
+                    //start of common statistics calculation
+                    buildTime += order.getBuildTime();
+                    weight += order.getWeight();
+                    supportWeight += order.getSupportWeight();
+                    itemsPrinted += order.getQuantity();
+
+                    if (order.getStatus().equals("Sold")) {
+                        soldPrice += order.getPrice();
+                        soldCosts += order.getCosts();
+                        sold++;
+                    } else if (order.getStatus().equals("Not Sold")) {
+                        notSoldPrice += order.getPrice();
+                        notSoldCosts += order.getCosts();
+                        notSold++;
+                    }
+                }
+
+                pricePerHour = (soldPrice + notSoldPrice)/buildTime*60;
+
+                ordersLabelNotSold.setText("Not Sold (" + notSold + ")");
+                ordersLabelSold.setText("Not Sold (" + sold + ")");
+                ordersLabelTotal.setText("Total(" + total + ")");
+                ordersLabelSoldPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", soldPrice, soldCosts, soldPrice - soldCosts));
+                ordersLabelNotSoldPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", notSoldPrice, notSoldCosts, notSoldPrice - notSoldCosts));
+                ordersLabelTotalPriceCostsProfit.setText(String.format("%.2f $/%.2f $ (%.2f $)", soldPrice + notSoldPrice, soldCosts + notSoldCosts, (soldPrice + notSoldPrice) - (soldCosts + notSoldCosts)));
+                ordersLabelTotalPerHour.setText(String.format("%.2f $/h", pricePerHour));
+                ordersLabelTotalWeightSupports.setText(String.format("%.2f kg/%.2f kg", weight/1000, supportWeight/1000));
+                ordersLabelTotalBuildTime.setText(buildTime + "");
+                ordersLabelTotalItemsPrinted.setText(itemsPrinted + "");
+            }
+        });
+
     }
 
 
@@ -1247,7 +1246,7 @@ public class ControllerMain implements Initializable {
                         updateProgress(++i, max);
 
                         updateMessage("Now calculating content.");
-                        Platform.runLater(() -> calculateAllStatistics());
+                        calculateAllStatistics();
                         updateProgress(++i, max);
 
                         updateProgress(max, max);
@@ -1269,16 +1268,6 @@ public class ControllerMain implements Initializable {
 
 
     /*****************************          INITIALIZE COSTS TAB          *****************************/
-    costsTv.itemsProperty().bindBidirectional(listOfCostsProperty);
-
-    listOfCostsProperty.addListener((observable, oldList, newList) -> {
-        System.out.println("Changed");
-        calculateAllStatistics();
-    });
-
-//    listOfCosts.addListener((ListChangeListener<Cost>) c -> {
-//        System.out.println("list changed");
-//    });
 
     costsTv.setRowFactory( tv -> {
         TableRow<Cost> row = new TableRow<>();
@@ -1453,7 +1442,7 @@ public class ControllerMain implements Initializable {
             }
     });
 
-    printersBtnDelete.setOnAction(event -> Printer.deletePrinters(printersTv.getSelectionModel().getSelectedItems(), ds));
+    printersBtnDelete.setOnAction(event -> Printer.safeDeletePrinters(printersTv.getSelectionModel().getSelectedItems(), ds));
 
     printersBtnRefresh.setOnAction(event -> PrintedAPI.serviceStart(serviceDownloadAllTables));
 
